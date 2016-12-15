@@ -8,7 +8,8 @@
 
 * no regexp （faster）
 * wildcards router support
-* can decode request before business layer (JSON, xml or other)
+* decode request body before business layer (JSON, xml or other)
+* decode request url before business layer
 * handler simple and pro
 
 # Demos and Sample Usage
