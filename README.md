@@ -1,5 +1,8 @@
 # A High performance HTTP request router with Context
 
+* [Features](#features)
+* [Demos and Sample Usage](#demos-and-sample-usage)
+* [Restful Api Server Example](#restful-api-server-example)
 
 # Features
 
@@ -7,8 +10,6 @@
 * wildcards router support
 * can decode request before business layer (JSON, xml or other)
 * handler simple and pro
-
-
 
 # Demos and Sample Usage
 
@@ -79,7 +80,7 @@ type UserContext struct {
 	Data  *User
 }
 
-//Auto Decode Json or other request if  c.Request.Header.Get("Content-Type") contains json
+//Auto Decode Json or other request if headers Content-Type contains application/json
 func (ctx *UserContext) DecodeRequest() error{
 	ctx.Data = new(User)
 	ctx.Context.Data = ctx.Data
