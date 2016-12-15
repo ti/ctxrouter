@@ -68,7 +68,7 @@ func All(ctx *ctxrouter.Context,  path string) {
 
 //decode request
 type User struct {
-	Id      int              `json:"int"`
+	Id      int             `json:"int"`
 	Name    string          `json:"name"`
 }
 
