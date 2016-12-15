@@ -8,7 +8,9 @@
 * can decode request before business layer (JSON, xml or other)
 * handler simple and pro
 
-# Hello World Sample
+
+
+# Demos and Sample Usage
 
 ```go
 package main
@@ -30,7 +32,6 @@ func main() {
 	r.All("/all/*path",All)
 	r.Post("/hello",(*UserContext).PrintHello)
 	http.ListenAndServe(":8081", r)
-
 }
 
 type Controller struct {
@@ -66,7 +67,7 @@ func All(ctx *ctxrouter.Context,  path string) {
 	ctx.Text("all router goes here " +  path)
 }
 
-//decode request
+//decode request sample
 type User struct {
 	Id      int             `json:"int"`
 	Name    string          `json:"name"`
@@ -92,7 +93,68 @@ func (ctx *UserContext) PrintHello() {
 
 ```
 
-# Hello Word Simple Request
+
+# Restful Api Server Example
+
+```go
+package main
+
+import (
+	"net/http"
+	"github.com/leenanxi/ctxrouter"
+)
+
+func main() {
+	r := ctxrouter.New()
+	r.Get("/apps", (*Server).GetApps)
+	r.Get("/apps/:id", (*Server).GetApp)
+	r.Post("/apps", (*Server).PostApps)
+	r.Patch("/apps/:id", (*Server).PatchApp)
+	r.Put("/apps/:id", (*Server).PutApp)
+	r.Delete("/apps/:id", (*Server).DeleteApp)
+	http.ListenAndServe(":8081", r)
+}
+
+type Server struct {
+	ctxrouter.Context
+	config *Config
+	storage Storage
+}
+
+
+func (this *Server) GetApps() {
+	this.Text("get apps")
+}
+
+func (this *Server) GetApp(id string) {
+	this.Text("get app " + id)
+}
+
+func (this *Server) PostApps() {
+	this.Text("post apps")
+}
+
+func (this *Server) DeleteApp(id string) {
+	this.Text("delete app " + id)
+}
+
+func (this *Server) PutApp(id string) {
+	this.Text("put app " + id)
+}
+
+func (this *Server) PatchApp(id string) {
+	this.Text("patch app " + id)
+}
+
+
+//some config and storage
+type Config struct {}
+
+type Storage interface {}
+```
+
+
+# Curl Request example for auto decode
 
 ```bash
 curl -i -X POST \
