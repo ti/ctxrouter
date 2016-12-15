@@ -103,54 +103,37 @@ import (
 	"net/http"
 	"github.com/leenanxi/ctxrouter"
 )
-
 func main() {
 	r := ctxrouter.New()
-	r.Get("/apps", (*Server).GetApps)
-	r.Get("/apps/:id", (*Server).GetApp)
-	r.Post("/apps", (*Server).PostApps)
-	r.Patch("/apps/:id", (*Server).PatchApp)
-	r.Put("/apps/:id", (*Server).PutApp)
-	r.Delete("/apps/:id", (*Server).DeleteApp)
+	r.Get("/apps", (*AppContext).GetApps)
+	r.Get("/apps/:id", (*AppContext).GetApp)
+	r.Post("/apps", (*AppContext).PostApps)
+	r.Patch("/apps/:id", (*AppContext).PatchApp)
+	r.Put("/apps/:id", (*AppContext).PutApp)
+	r.Delete("/apps/:id", (*AppContext).DeleteApp)
 	http.ListenAndServe(":8081", r)
 }
-
-type Server struct {
+type AppContext struct {
 	ctxrouter.Context
-	config *Config
-	storage Storage
 }
-
-
-func (this *Server) GetApps() {
-	this.Text("get apps")
+func (ctx *AppContext) GetApps() {
+	ctx.Text("get apps")
 }
-
-func (this *Server) GetApp(id string) {
-	this.Text("get app " + id)
+func (ctx *AppContext) GetApp(id string) {
+	ctx.Text("get app " + id)
 }
-
-func (this *Server) PostApps() {
-	this.Text("post apps")
+func (ctx *AppContext) PostApps() {
+	ctx.Text("post apps")
 }
-
-func (this *Server) DeleteApp(id string) {
-	this.Text("delete app " + id)
+func (ctx *AppContext) DeleteApp(id string) {
+	ctx.Text("delete app " + id)
 }
-
-func (this *Server) PutApp(id string) {
-	this.Text("put app " + id)
+func (ctx *AppContext) PutApp(id string) {
+	ctx.Text("put app " + id)
 }
-
-func (this *Server) PatchApp(id string) {
-	this.Text("patch app " + id)
+func (ctx *AppContext) PatchApp(id string) {
+	ctx.Text("patch app " + id)
 }
-
-
-//some config and storage
-type Config struct {}
-
-type Storage interface {}
 ```
 
 
