@@ -33,7 +33,7 @@ func (c *Context) Init(w http.ResponseWriter, r *http.Request) {
 	c.Request = r
 }
 
-//you can implement your DecodeRequest, it can be form or something else
+//DecodeRequest You can implement your DecodeRequest, it can be form or something else
 func (c *Context) DecodeRequest() error {
 	if strings.Contains(c.Request.Header.Get("Content-Type"), "json") {
 		decoder := json.NewDecoder(c.Request.Body)
@@ -44,7 +44,7 @@ func (c *Context) DecodeRequest() error {
 	}
 	return nil
 }
-
+//JSON response json
 func (c *Context) JSON(data interface{}) {
 	if d, err := json.Marshal(data); err != nil {
 		panic("Error marshalling json: %v:" + err.Error())
@@ -53,21 +53,23 @@ func (c *Context) JSON(data interface{}) {
 		c.Writer.Write(d)
 	}
 }
-
+//Text response textplain
 func (c *Context) Text(data string) {
 	io.WriteString(c.Writer, data)
 }
 
-
+//Status set response status code
 func (c *Context) Status(status int) {
 	c.Writer.WriteHeader(status)
 }
 
+//StatusText response textplain by http.Status code
 func (c *Context) StatusText(status int) {
 	io.WriteString(c.Writer, http.StatusText(status))
 }
 
-//exp := write {"error":"not_found", "error_description":"not fond something"}
+//StatusError output standard error json body by http.Status code
+//exp: StatusError(404,"not fond something"),will output {"error":"not_found", "error_description":"not fond something"}
 func (c *Context) StatusError(status int, errorDescription string) {
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(status)
