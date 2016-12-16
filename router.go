@@ -21,6 +21,8 @@ import (
 	"errors"
 )
 
+const ParamHeader  = "X-Ctxrouter-Params"
+
 var router *Router
 
 type (
@@ -134,7 +136,7 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if val.CallT == nil {
-		r.Header["X-Ctxrouter-Params"] = params
+		r.Header[ParamHeader] = params
 		if h, ok := val.CallV.Interface().(http.HandlerFunc); ok {
 			h.ServeHTTP(w,r)
 		} else if hf, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {

@@ -190,7 +190,7 @@ func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
 
 func NormalHandler(w http.ResponseWriter, r *http.Request) {
 	//get router Params from "X-Ctxrouter-Params" without any extra function
-	params := r.Header["X-Ctxrouter-Params"]
+	params := r.Header[ctxrouter.ParamHeader]
 	w.Write([]byte("Name:" + params[0] + "\nAge:" + params[1] ))
 }
 ```
@@ -374,7 +374,7 @@ func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
 
 func NormalHandler(w http.ResponseWriter, r *http.Request) {
 	//get router Params from "X-Ctxrouter-Params" without any extra function
-	params := r.Header["X-Ctxrouter-Params"]
+	params := r.Header[ctxrouter.ParamHeader]
 	w.Write([]byte("Name:" + params[0] + "\nAge:" + params[1] ))
 }
 ```
