@@ -69,7 +69,7 @@ func (c *Context) StatusText(status int) {
 }
 
 //StatusError output standard error json body by http.Status code
-//exp: StatusError(404,"not fond something"),will output {"error":"not_found", "error_description":"not fond something"}
+//exp: StatusError(404,"not fond something"),will response {"error":"not_found", "error_description":"not fond something"}
 func (c *Context) StatusError(status int, errorDescription string) {
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.Writer.WriteHeader(status)
