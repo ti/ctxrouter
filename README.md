@@ -27,10 +27,20 @@
 package main
 
 import (
-	"net/http"
-	"fmt"
 	"github.com/leenanxi/ctxrouter"
+	"fmt"
+	"net/http"
 )
+
+
+//context style
+func (c *Controller) Hello(name string) {
+	fmt.Fprintln(c.Writer, "hello "+name)
+}
+//normal style
+func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello"))
+}
 
 func main() {
 	r := ctxrouter.New()
@@ -38,6 +48,7 @@ func main() {
 	//auto decode url with string or int
 	r.Get("/basic/:name/json/:age", (*Controller).Json)
 	r.Get("/basic/:name", (*Controller).Hello)
+	r.Get("/normal/*path", NormalHelloHandler)
 	//match path prefixes /all/*:
 	r.All("/basic/*path",(*Controller).All)
 	//a simple func without implement ctxrouter.Context
@@ -51,10 +62,6 @@ type Controller struct {
 
 func (c *Controller) Index() {
 	c.Text("index")
-}
-
-func (c *Controller) Hello(name string) {
-	fmt.Fprintln(c.Writer, "hello "+name)
 }
 
 func (c *Controller) All(path string) {
@@ -86,12 +93,6 @@ import (
 	"github.com/leenanxi/ctxrouter"
 )
 
-func main() {
-	r := ctxrouter.New()
-	r.Get("/context/",(*Context).Start)
-	http.ListenAndServe(":8081", r)
-}
-
 type Context struct {
 	ctxrouter.Context
 	Data  map[string]string
@@ -112,6 +113,12 @@ func (c *Context) End() {
 	c.Data["context2"] = "2"
 	c.JSON(c.Data)
 }
+
+func main() {
+	r := ctxrouter.New()
+	r.Get("/context/",(*Context).Start)
+	http.ListenAndServe(":8081", r)
+}
 ```
 
 
@@ -124,12 +131,6 @@ import (
 	"net/http"
 	"github.com/leenanxi/ctxrouter"
 )
-
-func main() {
-	r := ctxrouter.New()
-	r.Post("/users/hello",(*UserContext).SayHello)
-	http.ListenAndServe(":8081", r)
-}
 
 //decode request sample
 type User struct {
@@ -151,6 +152,12 @@ func (ctx *UserContext) DecodeRequest() error {
 
 func (ctx *UserContext) SayHello() {
 	ctx.Text("Hello "+ ctx.Data.Name)
+}
+
+func main() {
+	r := ctxrouter.New()
+	r.Post("/users/hello",(*UserContext).SayHello)
+	http.ListenAndServe(":8081", r)
 }
 ```
 
@@ -175,15 +182,6 @@ import (
 	"net/http"
 )
 
-func main() {
-	r := ctxrouter.New()
-	r.Get("/normal/hello",NormalHelloHandler)
-	r.Get("/normal/v1/:name/:age",NormalHandler)
-	//support any http.Handler interface
-	r.Get("/404",http.NotFoundHandler())
-	http.ListenAndServe(":8081", r)
-}
-
 func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("HELLO"))
 }
@@ -193,6 +191,16 @@ func NormalHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.Header[ctxrouter.ParamHeader]
 	w.Write([]byte("Name:" + params[0] + "\nAge:" + params[1] ))
 }
+
+func main() {
+	r := ctxrouter.New()
+	r.Get("/normal/hello",NormalHelloHandler)
+	r.Get("/normal/v1/:name/:age",NormalHandler)
+	//support any http.Handler interface
+	r.Get("/404",http.NotFoundHandler())
+	http.ListenAndServe(":8081", r)
+}
+
 ```
 
 ## Static Files
