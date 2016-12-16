@@ -3,8 +3,8 @@
 * [Features](#features)
 * [Examples](#examples)
   * [Basic Example](#basic-example)
-  * [Decode Json Before Business Layer](#decode-json-before-business-layer)
   * [With Powerful Context](#with-powerful-context)
+  * [Decode Request Before Business Layer](#decode-request-before-business-layer)
   * [Normal HTTP Handler](#normal-http-handler)
   * [Static Files](#static-files)
   * [Restful Api](#restful-api)
@@ -74,54 +74,6 @@ func Simple(ctx *ctxrouter.Context, name string) {
 }
 ```
 
-## Decode Json Before Business Layer
-
-```go
-package main
-
-import (
-	"net/http"
-	"github.com/leenanxi/ctxrouter"
-)
-
-func main() {
-	r := ctxrouter.New()
-	r.Post("/users/hello",(*UserContext).PrintHello)
-	http.ListenAndServe(":8081", r)
-}
-
-//decode request sample
-type User struct {
-	Id      int             `json:"int"`
-	Name    string          `json:"name"`
-}
-
-type UserContext struct {
-	ctxrouter.Context
-	Data  *User
-}
-
-//Auto Decode Json or other request
-func (ctx *UserContext) DecodeRequest() error{
-	ctx.Data = new(User)
-	ctx.Context.Data = ctx.Data
-	return ctx.Context.DecodeRequest()
-}
-
-func (ctx *UserContext) PrintHello() {
-	ctx.Text("Hello "+ ctx.Data.Name)
-}
-```
-
-```bash
-curl -i -X POST \
-   -H "Content-Type:application/json" \
-   -d \
-'{"name":"leenanxi"}' \
- 'http://localhost:8081/users/hello'
-```
-
-
 
 ## With Powerful Context
 
@@ -160,6 +112,54 @@ func (c *Context) End() {
 	c.Data["context2"] = "2"
 	c.JSON(c.Data)
 }
+```
+
+
+## Decode Request Before Business Layer
+
+```go
+package main
+
+import (
+	"net/http"
+	"github.com/leenanxi/ctxrouter"
+)
+
+func main() {
+	r := ctxrouter.New()
+	r.Post("/users/hello",(*UserContext).SayHello)
+	http.ListenAndServe(":8081", r)
+}
+
+//decode request sample
+type User struct {
+	Id      int             `json:"int"`
+	Name    string          `json:"name"`
+}
+
+type UserContext struct {
+	ctxrouter.Context
+	Data  *User
+}
+
+//Auto Decode Json or other request
+func (ctx *UserContext) DecodeRequest() error {
+	ctx.Data = new(User)
+	ctx.Context.Data = ctx.Data
+	return ctx.Context.DecodeRequest()
+}
+
+func (ctx *UserContext) SayHello() {
+	ctx.Text("Hello "+ ctx.Data.Name)
+}
+```
+
+```bash
+curl -i -X POST \
+   -H "Content-Type:application/json" \
+   -d \
+'{"name":"leenanxi"}' \
+ 'http://localhost:8081/users/hello'
 ```
 
 
