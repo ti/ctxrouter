@@ -63,19 +63,24 @@ func (this *Router) Add(path, method string, v interface{}) error {
 	val := Value{
 		V:v,
 		CallV:reflect.ValueOf(v),
-		CallT:reflect.TypeOf(v),
 	}
 	if reflect.TypeOf(v).Kind() == reflect.Func {
-		val.CallT = reflect.TypeOf(v).In(0).Elem()
-		paramsLen := val.CallV.Type().NumIn()
-		val.HasParams = paramsLen > 1
-		for i := 0; i < paramsLen; i++ {
-			if i > 0 {
-				if i == 1 {
-					val.ParamsT = make([]reflect.Type, 0)
-					val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
-				} else if i > 1 {
-					val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
+		if _, ok := val.CallV.Interface().(http.HandlerFunc); ok {
+			//do noting
+		} else if _, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
+			//do noting
+		} else {
+			val.CallT = reflect.TypeOf(v).In(0).Elem()
+			paramsLen := val.CallV.Type().NumIn()
+			val.HasParams = paramsLen > 1
+			for i := 0; i < paramsLen; i++ {
+				if i > 0 {
+					if i == 1 {
+						val.ParamsT = make([]reflect.Type, 0)
+						val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
+					} else if i > 1 {
+						val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
+					}
 				}
 			}
 		}
@@ -103,7 +108,7 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 			} else {
 				val = v.data["default"]
 			}
-			if val.V != nil && p != nil {
+			if val.V != nil && val.CallT != nil && p != nil {
 				val.ParamsV = make([]reflect.Value, 0)
 				for i, n := range p {
 					pt := val.ParamsT[i]
@@ -123,9 +128,18 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 }
 
 func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	val, _ := this.Match(r.Method, r.URL.Path)
+	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
 		http.NotFoundHandler().ServeHTTP(w, r)
+		return
+	}
+	if val.CallT == nil {
+		r.Header["X-Ctxrouter-Params"] = params
+		if h, ok := val.CallV.Interface().(http.HandlerFunc); ok {
+			h.ServeHTTP(w,r)
+		} else if hf, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
+			hf(w,r)
+		}
 		return
 	}
 	ctx := reflect.New(val.CallT).Interface().(ContextInterface)
