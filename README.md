@@ -35,11 +35,11 @@ import (
 func main() {
 	r := ctxrouter.New()
 	r.Get("/", (*Controller).Index)
+	//auto decode url with string or int
+	r.Get("/basic/:name/json/:age", (*Controller).Json)
 	r.Get("/basic/:name", (*Controller).Hello)
 	//match path prefixes /all/*:
 	r.All("/basic/*path",(*Controller).All)
-	//auto decode url with string or int
-	r.Get("/basic/:name/json/:age", (*Controller).Json)
 	//a simple func without implement ctxrouter.Context
 	r.Get("/basic/:name/simple",Simple)
 	http.ListenAndServe(":8081", r)
