@@ -187,6 +187,17 @@ func (this *Router) Delete(path string, controller interface{}) {
 	}
 }
 
+func (this *Router) Head(path string, controller interface{}) {
+	if err := this.Add(path, "HEAD", controller); err != nil {
+		panic(err)
+	}
+}
+
+func (this *Router) Options(path string, controller interface{}) {
+	if err := this.Add(path, "OPTIONS", controller); err != nil {
+		panic(err)
+	}
+}
 func (this *Router) All(path string, controller interface{}) {
 	if err := this.Add(path, "", controller); err != nil {
 		panic(err)
