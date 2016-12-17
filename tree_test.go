@@ -35,7 +35,7 @@ func printChildren(n *node, prefix string) {
 
 // Used as a workaround since we can't compare functions or their addresses
 
-func fakeHandler(val string) Handle {
+func fakeHandler(val string) handle {
 	return "RESULT - " + val
 }
 
