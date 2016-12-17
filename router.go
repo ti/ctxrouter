@@ -29,8 +29,8 @@ func Params(req *http.Request) []string {
 }
 
 //New new http router, it can be handler by system
-func New() *router {
-	return  &router{tree: &node{}, }
+func New() *Router {
+	return  &Router{tree: &node{}, }
 }
 
 const paramHeader  = "X-Ctxrouter-Params"
@@ -50,7 +50,7 @@ type (
 		Init(http.ResponseWriter, *http.Request)
 		DecodeRequest() error
 	}
-	router struct {
+	Router struct {
 		tree   *node
 	}
 	leaf struct {
@@ -61,7 +61,7 @@ type (
 
 
 
-func (this *router) Add(path, method string, v interface{}) error {
+func (this *Router) Add(path, method string, v interface{}) error {
 	if method == "" {
 		method = "default"
 	}
@@ -90,6 +90,9 @@ func (this *router) Add(path, method string, v interface{}) error {
 			}
 		}
 	}
+	if this.tree == nil {
+		this.tree = &node{}
+	}
 	if vMap, _, _ := this.tree.getValue(path); vMap != nil {
 		if vMap, ok := vMap.(*leaf); ok {
 			vMap.data[method] = val
@@ -105,7 +108,7 @@ func (this *router) Add(path, method string, v interface{}) error {
 }
 
 
-func (this *router) Match(method, path string) (val Value, p []string) {
+func (this *Router) Match(method, path string) (val Value, p []string) {
 	if v, p, _ := this.tree.getValue(path); v != nil {
 		if v, ok := v.(*leaf); ok {
 			if v.data[method].V != nil {
@@ -132,7 +135,7 @@ func (this *router) Match(method, path string) (val Value, p []string) {
 	return val, p
 }
 
-func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
 		http.NotFoundHandler().ServeHTTP(w, r)
@@ -160,48 +163,48 @@ func (this *router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val.CallV.Call(in)
 }
 
-func (this *router) Get(path string, controller interface{}) {
+func (this *Router) Get(path string, controller interface{}) {
 	if err := this.Add(path, "GET", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Post(path string, controller interface{}) {
+func (this *Router) Post(path string, controller interface{}) {
 	if err := this.Add(path, "POST", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Patch(path string, controller interface{}) {
+func (this *Router) Patch(path string, controller interface{}) {
 	if err := this.Add(path, "PATCH", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Put(path string, controller interface{}) {
+func (this *Router) Put(path string, controller interface{}) {
 	if err := this.Add(path, "PUT", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Delete(path string, controller interface{}) {
+func (this *Router) Delete(path string, controller interface{}) {
 	if err := this.Add(path, "DELETE", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Head(path string, controller interface{}) {
+func (this *Router) Head(path string, controller interface{}) {
 	if err := this.Add(path, "HEAD", controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *router) Options(path string, controller interface{}) {
+func (this *Router) Options(path string, controller interface{}) {
 	if err := this.Add(path, "OPTIONS", controller); err != nil {
 		panic(err)
 	}
 }
-func (this *router) All(path string, controller interface{}) {
+func (this *Router) All(path string, controller interface{}) {
 	if err := this.Add(path, "", controller); err != nil {
 		panic(err)
 	}
