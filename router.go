@@ -21,9 +21,26 @@ import (
 	"errors"
 )
 
-const ParamHeader  = "X-Ctxrouter-Params"
+
+
+
+//Param get params form request (It is faster than most other function, because there is no extra compute )
+//req http.Request
+func Params(req *http.Request) []string {
+	return  req.Header[paramHeader]
+}
+
+//New new http router, it can be handler by system
+func New() *Router {
+	router = &Router{
+		tree: &node{},
+	}
+	return router
+}
 
 var router *Router
+
+const paramHeader  = "X-Ctxrouter-Params"
 
 type (
 	Router struct {
@@ -51,12 +68,7 @@ type Value  struct {
 	HasParams bool //faster when callback
 }
 
-func New() *Router {
-	router = &Router{
-		tree: &node{},
-	}
-	return router
-}
+
 
 func (this *Router) Add(path, method string, v interface{}) error {
 	if method == "" {
@@ -136,7 +148,7 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if val.CallT == nil {
-		r.Header[ParamHeader] = params
+		r.Header[paramHeader] = params
 		if h, ok := val.CallV.Interface().(http.HandlerFunc); ok {
 			h.ServeHTTP(w,r)
 		} else if hf, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {

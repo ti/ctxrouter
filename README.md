@@ -12,7 +12,7 @@
 
 # Features
 
-* Context Append on current Function
+* Context Append on Current Function
 * Best Performance (no regexp match)
 * Wildcards Router Support (PathPrefix)
 * Decode request body before business layer (JSON, xml or other)
@@ -28,9 +28,9 @@
 package main
 
 import (
-	"github.com/leenanxi/ctxrouter"
 	"fmt"
 	"net/http"
+	"github.com/leenanxi/ctxrouter"
 )
 
 
@@ -39,17 +39,16 @@ func (c *Controller) Hello(name string) {
 	fmt.Fprintln(c.Writer, "hello "+name)
 }
 //normal style
-func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hello"))
+func NormalHello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello " + ctxrouter.Params(r)[0]))  
 }
-
 func main() {
 	r := ctxrouter.New()
 	r.Get("/", (*Controller).Index)
 	//auto decode url with string or int
 	r.Get("/basic/:name/json/:age", (*Controller).Json)
 	r.Get("/basic/:name", (*Controller).Hello)
-	r.Get("/normal/*path", NormalHelloHandler)
+	r.Get("/normal/:name", NormalHello)
 	//match path prefixes /all/*:
 	r.All("/basic/*path",(*Controller).All)
 	//a simple func without implement ctxrouter.Context
@@ -188,8 +187,7 @@ func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func NormalHandler(w http.ResponseWriter, r *http.Request) {
-	//get router Params from "X-Ctxrouter-Params" without any extra function
-	params := r.Header[ctxrouter.ParamHeader]
+	params := ctxrouter.Params(r)
 	w.Write([]byte("Name:" + params[0] + "\nAge:" + params[1] ))
 }
 
@@ -383,7 +381,7 @@ func NormalHelloHandler(w http.ResponseWriter, r *http.Request) {
 
 func NormalHandler(w http.ResponseWriter, r *http.Request) {
 	//get router Params from "X-Ctxrouter-Params" without any extra function
-	params := r.Header[ctxrouter.ParamHeader]
+	params := ctxrouter.Params(r)
 	w.Write([]byte("Name:" + params[0] + "\nAge:" + params[1] ))
 }
 ```
