@@ -44,7 +44,7 @@ func NormalHello(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := ctxrouter.New()
 	r.Get("/basic/:name", (*Context).Hello)
-        r.Get("/normal/:name", NormalHello)
+    r.Get("/normal/:name", NormalHello)
 	r.Get("/", (*Context).Index)
 	//auto decode url with string or int
 	r.Get("/basic/:name/json/:age", (*Context).Json)
