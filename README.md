@@ -28,47 +28,46 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"github.com/leenanxi/ctxrouter"
+	"net/http"
 )
 
-
 //context style
-func (c *Controller) Hello(name string) {
-	fmt.Fprintln(c.Writer, "hello "+name)
+func (ctx *Context) Hello(name string) {
+	//ctx.Request ...
+	ctx.Writer.Write([]byte("hello " + name))
 }
 //normal style
 func NormalHello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hello " + ctxrouter.Params(r)[0]))  
+	w.Write([]byte("hello " + ctxrouter.Params(r)[0]))
 }
 func main() {
 	r := ctxrouter.New()
-	r.Get("/", (*Controller).Index)
+	r.Get("/basic/:name", (*Context).Hello)
+        r.Get("/normal/:name", NormalHello)
+	r.Get("/", (*Context).Index)
 	//auto decode url with string or int
-	r.Get("/basic/:name/json/:age", (*Controller).Json)
-	r.Get("/basic/:name", (*Controller).Hello)
-	r.Get("/normal/:name", NormalHello)
+	r.Get("/basic/:name/json/:age", (*Context).Json)
 	//match path prefixes /all/*:
-	r.All("/basic/*path",(*Controller).All)
+	r.All("/basic/*path",(*Context).All)
 	//a simple func without implement ctxrouter.Context
 	r.Get("/basic/:name/simple",Simple)
 	http.ListenAndServe(":8081", r)
 }
 
-type Controller struct {
+type Context struct {
 	ctxrouter.Context
 }
 
-func (c *Controller) Index() {
+func (c *Context) Index() {
 	c.Text("index")
 }
 
-func (c *Controller) All(path string) {
+func (c *Context) All(path string) {
 	c.Text("all router goes here " +  path)
 }
 
-func (c *Controller) Json(name string, age int) {
+func (c *Context) Json(name string, age int) {
 	type Person struct {
 		Name string
 		Age   int
