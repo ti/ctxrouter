@@ -12,11 +12,12 @@
 
 # Features
 
-* no regexp （faster）
-* wildcards router support (PathPrefix)
-* decode request body before business layer (JSON, xml or other)
-* decode request url before business layer
-* handler simple and pro
+* Context Append on current Function
+* Best Performance (no regexp match)
+* Wildcards Router Support (PathPrefix)
+* Decode request body before business layer (JSON, xml or other)
+* Decode request url before business layer
+* Zero Garbage
 
 # Examples
 
