@@ -30,28 +30,34 @@ package main
 import (
 	"github.com/leenanxi/ctxrouter"
 	"net/http"
+	"strconv"
 )
 
 //context style
-func (ctx *Context) Hello(name string) {
+func (ctx *Context) Hello(id string) {
 	//ctx.Request ...
-	ctx.Writer.Write([]byte("hello " + name))
+	ctx.Writer.Write([]byte("hello " + id))
 }
 //normal style
 func NormalHello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("hello " + ctxrouter.Params(r)[0]))
 }
+//func style
+func Hello(ctx *ctxrouter.Context, name string,  id int) {
+	ctx.Text("hello " + name + ", id is " + strconv.Itoa(id))
+}
+
 func main() {
 	r := ctxrouter.New()
 	r.Get("/basic/:name", (*Context).Hello)
-    r.Get("/normal/:name", NormalHello)
+	r.Get("/normal/:name", NormalHello)
+	r.Get("/func/:name/:id",Hello)
 	r.Get("/", (*Context).Index)
 	//auto decode url with string or int
 	r.Get("/basic/:name/json/:age", (*Context).Json)
 	//match path prefixes /all/*:
 	r.All("/basic/*path",(*Context).All)
 	//a simple func without implement ctxrouter.Context
-	r.Get("/basic/:name/simple",Simple)
 	http.ListenAndServe(":8081", r)
 }
 
@@ -73,10 +79,6 @@ func (c *Context) Json(name string, age int) {
 		Age   int
 	}
 	c.JSON(Person{Name:name,Age:age})
-}
-
-func Simple(ctx *ctxrouter.Context, name string) {
-	ctx.Text("simple " + name)
 }
 ```
 

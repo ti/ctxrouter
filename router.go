@@ -38,12 +38,13 @@ const paramHeader  = "X-Ctxrouter-Params"
 type (
 	//Value your can add any value on it, if you add a interface{} it will go to Value.V
 	Value  struct {
-		CallV     reflect.Value
-		CallT     reflect.Type
-		V         interface{}
-		ParamsV   []reflect.Value
-		ParamsT   []reflect.Type
-		HasParams bool //faster when callback
+		V         interface{} //match any value by router, you use Add & Match in other app 
+		
+		callV     reflect.Value 
+		callT     reflect.Type
+		paramsV   []reflect.Value
+		paramsT   []reflect.Type
+		hasParams bool //faster when callback
 	}
 	//ContextInterface you can add anycontext you want if it implement ContextInterface
 	ContextInterface interface {
@@ -67,24 +68,24 @@ func (this *Router) Add(path, method string, v interface{}) error {
 	}
 	val := Value{
 		V:v,
-		CallV:reflect.ValueOf(v),
+		callV:reflect.ValueOf(v),
 	}
 	if reflect.TypeOf(v).Kind() == reflect.Func {
-		if _, ok := val.CallV.Interface().(http.HandlerFunc); ok {
+		if _, ok := val.callV.Interface().(http.HandlerFunc); ok {
 			//do noting
-		} else if _, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
+		} else if _, ok := val.callV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
 			//do noting
 		} else {
-			val.CallT = reflect.TypeOf(v).In(0).Elem()
-			paramsLen := val.CallV.Type().NumIn()
-			val.HasParams = paramsLen > 1
+			val.callT = reflect.TypeOf(v).In(0).Elem()
+			paramsLen := val.callV.Type().NumIn()
+			val.hasParams = paramsLen > 1
 			for i := 0; i < paramsLen; i++ {
 				if i > 0 {
 					if i == 1 {
-						val.ParamsT = make([]reflect.Type, 0)
-						val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
+						val.paramsT = make([]reflect.Type, 0)
+						val.paramsT = append(val.paramsT, val.callV.Type().In(i))
 					} else if i > 1 {
-						val.ParamsT = append(val.ParamsT, val.CallV.Type().In(i))
+						val.paramsT = append(val.paramsT, val.callV.Type().In(i))
 					}
 				}
 			}
@@ -116,13 +117,13 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 			} else {
 				val = v.data["default"]
 			}
-			if val.V != nil && val.CallT != nil && p != nil {
-				val.ParamsV = make([]reflect.Value, 0)
+			if val.V != nil && val.callT != nil && p != nil {
+				val.paramsV = make([]reflect.Value, 0)
 				for i, n := range p {
-					pt := val.ParamsT[i]
+					pt := val.paramsT[i]
 					pv, err := strConv(n, pt)
 					if err == nil {
-						val.ParamsV = append(val.ParamsV, pv)
+						val.paramsV = append(val.paramsV, pv)
 					} else {
 						return Value{}, nil
 					}
@@ -141,26 +142,26 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFoundHandler().ServeHTTP(w, r)
 		return
 	}
-	if val.CallT == nil {
+	if val.callT == nil {
 		r.Header[paramHeader] = params
-		if h, ok := val.CallV.Interface().(http.HandlerFunc); ok {
+		if h, ok := val.callV.Interface().(http.HandlerFunc); ok {
 			h.ServeHTTP(w,r)
-		} else if hf, ok := val.CallV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
+		} else if hf, ok := val.callV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
 			hf(w,r)
 		}
 		return
 	}
-	ctx := reflect.New(val.CallT).Interface().(ContextInterface)
+	ctx := reflect.New(val.callT).Interface().(ContextInterface)
 	ctx.Init(w, r)
 	if err := ctx.DecodeRequest(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	in := []reflect.Value{reflect.ValueOf(ctx)}
-	if val.HasParams {
-		in = append(in, val.ParamsV...)
+	if val.hasParams {
+		in = append(in, val.paramsV...)
 	}
-	val.CallV.Call(in)
+	val.callV.Call(in)
 }
 
 func (this *Router) Get(path string, controller interface{}) {
