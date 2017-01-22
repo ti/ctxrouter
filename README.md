@@ -203,6 +203,36 @@ func main() {
 
 ```
 
+## How Middleware X?
+
+The router is `http.Handler`,  so you can chain any http.Handler compatible middleware before the router, for  example http://www.gorillatoolkit.org/pkg/handlers
+
+```go
+package main
+
+import (
+	"github.com/leenanxi/ctxrouter"
+	"github.com/gorilla/handlers"
+	"os"
+	"net/http"
+)
+
+//context style
+func (ctx *Context) Hello(name string) {
+	ctx.Text("hello " + name)
+}
+
+func main() {
+	r := ctxrouter.New()
+	r.Get("/hello/:name", (*Context).Hello)
+	http.ListenAndServe(":8081", (handlers.LoggingHandler(os.Stdout, r)))
+}
+
+type Context struct {
+	ctxrouter.Context
+}
+```
+
 ## Static Files
 
 ```go

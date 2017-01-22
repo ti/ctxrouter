@@ -58,6 +58,10 @@ func (c *Context) Text(data string) {
 	io.WriteString(c.Writer, data)
 }
 
+func (c *Context) Redirect(urlStr string, code int) {
+	http.Redirect(c.Writer,c.Request,urlStr,code)
+}
+
 //Status set response status code
 func (c *Context) Status(status int) {
 	c.Writer.WriteHeader(status)
@@ -75,3 +79,43 @@ func (c *Context) StatusError(status int, errorDescription string) {
 	c.Writer.WriteHeader(status)
 	c.Writer.Write([]byte(`{"error":"` +  strings.ToLower(strings.Replace(http.StatusText(status), " ", "_", -1)) + `","error_description":"` +  errorDescription + `"}`))
 }
+
+
+//stardard error moudle
+type Error struct {
+	Status           int    `json:"-"`
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description,omitempty"`
+	ErrorUri	 string `json:"error_uri,omitempty"`
+}
+
+func (this *Error) SetDescription(description string) *Error {
+	this.ErrorDescription = description
+	return this
+}
+
+func (this *Error) SetErrorDescription (errorDescription error) *Error {
+	if errorDescription != nil {
+		this.ErrorDescription = errorDescription.Error()
+	}
+	return this
+}
+
+func (this *Error) SetUri(uri string) *Error {
+	this.ErrorUri = uri
+	return this
+}
+
+func NewError() *Error {
+	return &Error{}
+}
+
+func NewStatusError(status int) *Error {
+	return &Error{Status: status, Error: strings.ToLower(strings.Replace(http.StatusText(status), " ", "_", -1))}
+}
+
+func (c *Context) Error(err *Error) {
+	c.Writer.WriteHeader(err.Status)
+	c.JSON(err)
+}
+
