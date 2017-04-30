@@ -28,7 +28,7 @@
 package main
 
 import (
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 	"net/http"
 	"strconv"
 )
@@ -91,7 +91,7 @@ package main
 
 import (
 	"net/http"
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 )
 
 type Context struct {
@@ -130,7 +130,7 @@ package main
 
 import (
 	"net/http"
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 )
 
 //decode request sample
@@ -179,7 +179,7 @@ Alert: This is Not recommended if you start a new project.
 package main
 
 import (
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 	"net/http"
 )
 
@@ -211,7 +211,7 @@ The router is `http.Handler`,  so you can chain any http.Handler compatible midd
 package main
 
 import (
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 	"github.com/gorilla/handlers"
 	"os"
 	"net/http"
@@ -239,7 +239,7 @@ type Context struct {
 package main
 
 import (
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 	"net/http"
 )
 
@@ -259,7 +259,7 @@ package main
 
 import (
 	"net/http"
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 )
 func main() {
 	r := ctxrouter.New()
@@ -304,7 +304,7 @@ package main
 import (
 	"net/http"
 	"fmt"
-	"github.com/leenanxi/ctxrouter"
+	"github.com/ti/ctxrouter"
 )
 
 func main() {
