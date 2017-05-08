@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"strconv"
 	"errors"
+	"encoding/json"
 )
 
 
@@ -161,7 +162,28 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if val.hasParams {
 		in = append(in, val.paramsV...)
 	}
-	val.callV.Call(in)
+	rets := val.callV.Call(in)
+	if len(rets) == 2 {
+		if (rets[1].IsNil()) {
+			if data, ok := rets[0].Interface().(interface{}); ok {
+				if d, err  := json.Marshal(data); err == nil {
+					w.Header().Set("Content-Type", "application/json")
+					w.Write(d)
+				}
+			}
+		} else {
+			if err0, ok := rets[1].Interface().(*Error); ok {
+				d, _ := json.Marshal(err0)
+				w.Header().Set("Content-Type", "application/json")
+				if (err0.Status > 0) {
+					w.WriteHeader(err0.Status)
+				}
+				w.Write(d)
+			} else if err1, ok := val.callV.Interface().(error); ok {
+				w.Write([]byte(err1.Error()))
+			}
+		}
+	}
 }
 
 func (this *Router) Get(path string, controller interface{}) {

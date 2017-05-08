@@ -15,7 +15,7 @@ type Error struct {
 func (this *Error) Error() string {
 	resp := this.ErrorType
 	if (this.ErrorDescription != "") {
-		resp += " - " + this.ErrorDescription
+		resp += ": " + this.ErrorDescription
 	}
 	return resp
 }
