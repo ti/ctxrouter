@@ -33,6 +33,15 @@ import (
 	"strconv"
 )
 
+
+//context common style
+func (ctx *Context) Resp(msg string) (interface{}, error){
+	if msg == "error" {
+		return nil,ctxrouter.HttpStatusError(400).SetDescription("hello error")
+	}
+	return map[string]bool{"success":true},nil
+}
+
 //context style
 func (ctx *Context) Hello(id string) {
 	//ctx.Request ...
@@ -49,6 +58,7 @@ func Hello(ctx *ctxrouter.Context, name string,  id int) {
 
 func main() {
 	r := ctxrouter.New()
+	r.Get("/resp/:msg", (*Context).Resp)
 	r.Get("/basic/:name", (*Context).Hello)
 	r.Get("/normal/:name", NormalHello)
 	r.Get("/func/:name/:id",Hello)
