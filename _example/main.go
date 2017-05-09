@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"log"
 	"errors"
+	"context"
 )
 
 //decode request sample
@@ -33,6 +34,17 @@ func (ctx *UserContext) DecodeRequest() error {
 func (ctx *UserContext) Hello(name string) {
 	ctx.Text("hello " + name)
 }
+//rpc x style
+
+
+func RpcX(ctx context.Context, args *User, reply *User) error {
+	if args.Id == 0 {
+		return ctxrouter.HttpStatusError(400).SetDescription("rpcx sample error")
+	}
+	reply = args
+	return nil
+}
+
 
 //resp json data and error
 func (ctx *UserContext) RespData(msg string) (interface{}, error) {

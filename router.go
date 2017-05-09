@@ -137,6 +137,13 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 	return val, p
 }
 
+
+func (this *Router) ServeRPCXOverHTTP(w http.ResponseWriter, r *http.Request) {
+
+
+
+
+}
 func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {

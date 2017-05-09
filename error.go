@@ -42,6 +42,12 @@ func (this *Error) SetStatus(status int) *Error {
 	return this
 }
 
+func NewError(t string) *Error {
+	return &Error{Status: 400, ErrorType: t}
+}
+
+
+
 func HttpStatusError(status int) *Error {
 	return &Error{Status: status, ErrorType: strings.ToLower(strings.Replace(http.StatusText(status), " ", "_", -1))}
 }
