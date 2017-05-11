@@ -138,12 +138,7 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 }
 
 
-func (this *Router) ServeRPCXOverHTTP(w http.ResponseWriter, r *http.Request) {
 
-
-
-
-}
 func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
@@ -170,7 +165,16 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		in = append(in, val.paramsV...)
 	}
 	rets := val.callV.Call(in)
-	if len(rets) == 2 {
+	if len(rets) == 1 {
+		if ret := rets[0]; !ret.IsNil() {
+			if data, ok := rets[0].Interface().(interface{}); ok {
+				if d, err  := json.Marshal(data); err == nil {
+					w.Header().Set("Content-Type", "application/json")
+					w.Write(d)
+				}
+			}
+		}
+	} else if len(rets) == 2 {
 		if (rets[1].IsNil()) {
 			if data, ok := rets[0].Interface().(interface{}); ok {
 				if d, err  := json.Marshal(data); err == nil {
@@ -191,6 +195,8 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+
 }
 
 func (this *Router) Get(path string, controller interface{}) {

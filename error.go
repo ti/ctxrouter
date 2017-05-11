@@ -10,6 +10,7 @@ type Error struct {
 	ErrorType        string `json:"error"`
 	ErrorDescription string `json:"error_description,omitempty"`
 	ErrorUri         string `json:"error_uri,omitempty"`
+	ErrorData        interface{} `json:"error_data,omitempty"`
 }
 
 func (this *Error) Error() string {
