@@ -35,7 +35,7 @@ func (c *Context) Init(w http.ResponseWriter, r *http.Request) {
 
 //DecodeRequest You can implement your DecodeRequest, it can be form or something else
 func (c *Context) DecodeRequest() error {
-	if strings.Contains(c.Request.Header.Get("Content-Type"), "json") {
+	if c.Data != nil && strings.Contains(c.Request.Header.Get("Content-Type"), "json"){
 		decoder := json.NewDecoder(c.Request.Body)
 		if err := decoder.Decode(&c.Data); err != nil {
 			return errors.New("json decode error - " + err.Error())
