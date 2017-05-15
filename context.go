@@ -44,6 +44,16 @@ func (c *Context) DecodeRequest() error {
 	}
 	return nil
 }
+
+
+func (c *Context) DecodeJson(data interface{}) error {
+	decoder := json.NewDecoder(c.Request.Body)
+	if err := decoder.Decode(data); err != nil {
+		return errors.New("json decode error - " + err.Error())
+	}
+	return nil
+}
+
 //JSON response json
 func (c *Context) JSON(data interface{}) {
 	if d, err := json.Marshal(data); err != nil {
