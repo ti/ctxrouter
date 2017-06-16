@@ -54,16 +54,15 @@ func HttpStatusError(status int) *Error {
 }
 
 
-
 func JSONResponse(w http.ResponseWriter, data interface{}) {
 	if err, ok := data.(*Error); ok {
-		writeResponse(w, err.Status, nil, err)
+		JSONResponseVerbose(w, err.Status, nil, err)
 	} else {
-		writeResponse(w, 200, nil, data)
+		JSONResponseVerbose(w, 200, nil, data)
 	}
 }
 
-func writeResponse(w http.ResponseWriter, status int, header http.Header, data interface{}) {
+func JSONResponseVerbose(w http.ResponseWriter, status int, header http.Header, data interface{}) {
 	if header != nil {
 		for k, v := range header {
 			for _, vv := range v {
@@ -82,7 +81,6 @@ func writeResponse(w http.ResponseWriter, status int, header http.Header, data i
 		w.Write(bs)
 		return
 	}
-
 	if d, err := json.Marshal(data); err != nil {
 		panic("Error marshalling json: %v:" + err.Error())
 	} else {
