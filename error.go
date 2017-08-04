@@ -44,6 +44,12 @@ func (this *Error) SetStatus(status int) *Error {
 	return this
 }
 
+func (this *Error) SetData(data interface{}) *Error {
+	this.ErrorData = data
+	return this
+}
+
+
 func NewError(t string) *Error {
 	return &Error{Status: 400, ErrorType: t}
 }
