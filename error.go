@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 )
 
+//Error Default HTTP Error
 type Error struct {
 	Status           int    `json:"-"`
-	ErrorType        string `json:"error"`
+	ErrorType        string `json:"error,omitempty"`
 	ErrorDescription string `json:"error_description,omitempty"`
+	ErrorCode        int `json:"error_code,omitempty"`
 	ErrorUri         string `json:"error_uri,omitempty"`
 	ErrorData        interface{} `json:"error_data,omitempty"`
 }
@@ -22,10 +24,20 @@ func (this *Error) Error() string {
 	return resp
 }
 
+func (this *Error) StatusCode() int {
+	return this.Status
+}
+
 func (this *Error) SetDescription(description string) *Error {
 	this.ErrorDescription = description
 	return this
 }
+
+func (this *Error) SetErrorCode(code int) *Error {
+	this.ErrorCode = code
+	return this
+}
+
 
 func (this *Error) SetErrorDescription(errorDescription error) *Error {
 	if errorDescription != nil {

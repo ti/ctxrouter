@@ -3,6 +3,7 @@
 * [Features](#features)
 * [Examples](#examples)
   * [Basic Example](#basic-example)
+  * [Custom Error](#custom-error)
   * [With Powerful Context](#with-powerful-context)
   * [Decode Request Before Business Layer](#decode-request-before-business-layer)
   * [Normal HTTP Handler](#normal-http-handler)
@@ -91,6 +92,52 @@ func (c *Context) Json(name string, age int) {
 	c.JSON(Person{Name:name,Age:age})
 }
 ```
+
+
+
+# Custom Error
+
+```go
+package main
+
+import (
+	"github.com/ti/ctxrouter"
+	"net/http"
+)
+
+type Error struct {
+	Code  int `json:"code"`
+	Msg   string `json:"msg"`
+}
+
+func (this *Error) StatusCode() int{
+	return 400
+}
+
+//Use Custom error
+func (ctx *Context) RespError() (interface{}, *Error){
+	return nil,&Error{Code:3000, Msg:"some error message"}
+}
+
+
+//use default error
+func (ctx *Context) RespErrorDefault() (interface{}, error){
+	return nil,ctxrouter.HttpStatusError(400).SetDescription("hello error")
+}
+
+
+func main() {
+	r := ctxrouter.New()
+	r.Get("/resp1", (*Context).RespError)
+	r.Get("/resp2", (*Context).RespErrorDefault)
+	http.ListenAndServe(":8081", r)
+}
+
+type Context struct {
+	ctxrouter.Context
+}
+```
+
 
 
 ## With Powerful Context

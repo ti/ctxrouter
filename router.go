@@ -183,15 +183,19 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		} else {
-			if err0, ok := rets[1].Interface().(*Error); ok {
-				d, _ := json.Marshal(err0)
+			if httpError, ok := rets[1].Interface().(ErrorInterface); ok {
+				d, _ := json.Marshal(httpError)
 				w.Header().Set("Content-Type", "application/json")
-				if (err0.Status > 0) {
-					w.WriteHeader(err0.Status)
+				statusCode := httpError.StatusCode()
+				if (statusCode > 0) {
+					w.WriteHeader(statusCode)
+				} else {
+					w.WriteHeader(400)
 				}
 				w.Write(d)
-			} else if err1, ok := val.callV.Interface().(error); ok {
-				w.Write([]byte(err1.Error()))
+			} else if errCommon, ok := rets[1].Interface().(error); ok {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(errCommon.Error()))
 			}
 		}
 	}
