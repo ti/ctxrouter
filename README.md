@@ -2,6 +2,7 @@
 
 * [Features](#features)
 * [Examples](#examples)
+  * [Hello Word](#hello-word)
   * [Basic Example](#basic-example)
   * [Custom Error](#custom-error)
   * [With Powerful Context](#with-powerful-context)
@@ -23,6 +24,36 @@
 # Examples
 
 
+
+## Hello Word
+
+```go
+func main() {
+	r := ctxrouter.New()
+	r.Get("/hello.html", (*Context).HelloHtml)
+	r.Get("/hello/:name/id/:age", (*Context).Hello)
+	r.Get("/hello/:name/error", (*Context).HelloHtml)
+	http.ListenAndServe(":8081", r)
+}
+
+func (ctx *Context) HelloHtml() {
+	ctx.Writer.Write([]byte("<html>hello</html>"))
+}
+
+func (ctx *Context) Hello(name string, id int) (interface{}, error){
+	return map[string]interface{}{"name":name, "id":id},nil
+}
+
+func (ctx *Context) HelloError(name string) (interface{}, error){
+	return nil, ctxrouter.HttpStatusError(400).SetDescription("some error")
+}
+
+type Context struct {
+	ctxrouter.Context
+}
+```
+
+
 ## Basic Example
 
 ```go
@@ -34,6 +65,20 @@ import (
 	"strconv"
 )
 
+func main() {
+	r := ctxrouter.New()
+	r.Get("/resp/:msg", (*Context).Resp)
+	r.Get("/basic/:name", (*Context).Hello)
+	r.Get("/normal/:name", NormalHello)
+	r.Get("/func/:name/:id",Hello)
+	r.Get("/", (*Context).Index)
+	//auto decode url with string or int
+	r.Get("/basic/:name/json/:age", (*Context).Json)
+	//match path prefixes /all/*:
+	r.All("/basic/*path",(*Context).All)
+	//a simple func without implement ctxrouter.Context
+	http.ListenAndServe(":8081", r)
+}
 
 //context common style
 func (ctx *Context) Resp(msg string) (interface{}, error){
@@ -55,21 +100,6 @@ func NormalHello(w http.ResponseWriter, r *http.Request) {
 //func style
 func Hello(ctx *ctxrouter.Context, name string,  id int) {
 	ctx.Text("hello " + name + ", id is " + strconv.Itoa(id))
-}
-
-func main() {
-	r := ctxrouter.New()
-	r.Get("/resp/:msg", (*Context).Resp)
-	r.Get("/basic/:name", (*Context).Hello)
-	r.Get("/normal/:name", NormalHello)
-	r.Get("/func/:name/:id",Hello)
-	r.Get("/", (*Context).Index)
-	//auto decode url with string or int
-	r.Get("/basic/:name/json/:age", (*Context).Json)
-	//match path prefixes /all/*:
-	r.All("/basic/*path",(*Context).All)
-	//a simple func without implement ctxrouter.Context
-	http.ListenAndServe(":8081", r)
 }
 
 type Context struct {
@@ -98,12 +128,12 @@ func (c *Context) Json(name string, age int) {
 # Custom Error
 
 ```go
-package main
-
-import (
-	"github.com/ti/ctxrouter"
-	"net/http"
-)
+func main() {
+	r := ctxrouter.New()
+	r.Get("/resp1", (*Context).RespError)
+	r.Get("/resp2", (*Context).RespErrorDefault)
+	http.ListenAndServe(":8081", r)
+}
 
 type Error struct {
 	Code  int `json:"code"`
@@ -123,14 +153,6 @@ func (ctx *Context) RespError() (interface{}, *Error){
 //use default error
 func (ctx *Context) RespErrorDefault() (interface{}, error){
 	return nil,ctxrouter.HttpStatusError(400).SetDescription("hello error")
-}
-
-
-func main() {
-	r := ctxrouter.New()
-	r.Get("/resp1", (*Context).RespError)
-	r.Get("/resp2", (*Context).RespErrorDefault)
-	http.ListenAndServe(":8081", r)
 }
 
 type Context struct {
