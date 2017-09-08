@@ -23,8 +23,6 @@
 
 # Examples
 
-
-
 ## Hello Word
 
 ```go
