@@ -142,7 +142,7 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
-		http.NotFoundHandler().ServeHTTP(w, r)
+		http.NotFound(w,r)
 		return
 	}
 	if val.callT == nil {
