@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 )
 
-
 //Param get params form request (It is faster than most other function, because there is no extra compute )
 //req http.Request
 func Params(req *http.Request) []string {
@@ -142,6 +141,10 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
+		if r.Method  == "OPTIONS" {
+			w.Header().Set("Allow", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
+			return
+		}
 		http.NotFound(w,r)
 		return
 	}
