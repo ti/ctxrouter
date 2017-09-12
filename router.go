@@ -142,7 +142,7 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	val, params := this.Match(r.Method, r.URL.Path)
 	if val.V == nil {
 		if r.Method  == "OPTIONS" {
-			w.Header().Set("Allow", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
 			return
 		}
 		http.NotFound(w,r)
