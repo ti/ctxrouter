@@ -88,8 +88,6 @@ func JSONResponseVerbose(w http.ResponseWriter, status int, header http.Header, 
 			}
 		}
 	}
-
-	w.Header().Set("Access-Control-Allow-Origin", "*", )
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
