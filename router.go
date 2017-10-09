@@ -38,8 +38,9 @@ const paramHeader  = "X-Ctxrouter-Params"
 type (
 	//Value your can add any value on it, if you add a interface{} it will go to Value.V
 	Value  struct {
-		V         interface{} //match any value by router, you use Add & Match in other app 
-		
+		V         interface{} //match any value by router, you use Add & Match in other app
+		Pattern   string
+
 		callV     reflect.Value 
 		callT     reflect.Type
 		paramsV   []reflect.Value
@@ -60,14 +61,13 @@ type (
 )
 
 
-
-
 func (this *Router) Add(path, method string, v interface{}) error {
 	if method == "" {
 		method = "default"
 	}
 	val := Value{
 		V:v,
+		Pattern:path,
 		callV:reflect.ValueOf(v),
 	}
 	if reflect.TypeOf(v).Kind() == reflect.Func {
