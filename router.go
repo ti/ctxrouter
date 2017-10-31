@@ -117,7 +117,7 @@ func (this *Router) Match(method, path string) (val Value, p []string) {
 			} else {
 				val = v.data["default"]
 			}
-			if val.V != nil && val.callT != nil && p != nil {
+			if val.V != nil && val.callT != nil && p != nil && len(p) == len(val.paramsT) {
 				val.paramsV = make([]reflect.Value, 0)
 				for i, n := range p {
 					pt := val.paramsT[i]
