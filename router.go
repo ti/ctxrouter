@@ -13,6 +13,9 @@ type Router struct {
 }
 
 func (s *Router) Handle(method, path string, v interface{}) error {
+	if method == "" {
+		method = "*"
+	}
 	path = adapterRouterStyle(path)
 	pattern, err := ParsePatternUrl(path)
 	if err != nil {
