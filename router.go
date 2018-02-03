@@ -142,18 +142,10 @@ func ParsePatternUrl(path string)  (pattern Pattern, err error){
 	if err != nil {
 		return
 	}
-
-
 	tp := cp.Compile()
-
-
-	if strings.HasSuffix(path,"/_") {
-		 tp.Pool[len(tp.Pool) - 1 ] = ""
-	}
 	pattern , err = NewPattern(tp.OpCodes, tp.Pool, tp.Verb)
 	return
 }
-
 
 
 //strConv convert string params to function params
