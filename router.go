@@ -61,34 +61,37 @@ func (s *Router) Match(method string, path string) (h Handler, pathParams map[st
 		c := components[l-1]
 		components[l-1], verb = c[:idx], c[idx+1:]
 	}
-	handlers, ok := s.handlers[method]
-	if !ok {
-		handlers, ok = s.handlers["*"]
+	h, pathParams, paramsList, err = match(s.handlers[method],components, verb)
+	if err != nil {
+		return match(s.handlers["*"],components, verb)
 	}
-	if ok {
-		for _, handler := range handlers {
-			pathParams, p, err := handler.Pat.Match(components, verb)
-			if err != nil {
-				continue
-			}
-			if handler.V != nil && handler.callT != nil && p != nil && len(p) == len(handler.paramsT) {
-				handler.paramsV = make([]reflect.Value, 0)
-				for i, n := range p {
-					pt := handler.paramsT[i]
-					pv, err := strConv(n, pt)
-					if err == nil {
-						handler.paramsV = append(handler.paramsV, pv)
-					} else {
-						return handler, pathParams, p,ErrNotMatch
-					}
+	return
+}
+
+func match(handlers []Handler, components []string, verb string)(h Handler, pathParams map[string]string, paramsList []string, err error) {
+	for _, handler := range handlers {
+		pathParams, p, err := handler.Pat.Match(components, verb)
+		if err != nil {
+			continue
+		}
+		if handler.V != nil && handler.callT != nil && p != nil && len(p) == len(handler.paramsT) {
+			handler.paramsV = make([]reflect.Value, 0)
+			for i, n := range p {
+				pt := handler.paramsT[i]
+				pv, err := strConv(n, pt)
+				if err == nil {
+					handler.paramsV = append(handler.paramsV, pv)
+				} else {
+					return handler, pathParams, p,ErrNotMatch
 				}
 			}
-			return handler, pathParams, p,nil
 		}
+		return handler, pathParams, p,nil
 	}
 	err = ErrNotMatch
 	return
 }
+
 
 type Handler struct {
 	Pat Pattern
