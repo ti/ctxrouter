@@ -1,4 +1,4 @@
-# A High performance HTTP request router with Context
+# A HTTP request router with Context
 
 * [Features](#features)
 * [Examples](#examples)
@@ -18,7 +18,7 @@
 * Best Performance (no regexp match)
 * Wildcards Router Support (PathPrefix)
 * Decode request body before business layer (JSON, xml or other)
-* Decode request url before business layer
+* Auto reflect url params to numbers
 * Zero Garbage
 
 # Examples
@@ -29,8 +29,8 @@
 func main() {
 	r := ctxrouter.New()
 	r.Get("/hello.html", (*Context).HelloHtml)
-	r.Get("/hello/:name/id/:age", (*Context).Hello)
-	r.Get("/hello/:name/error", (*Context).HelloHtml)
+	r.Get("/hello/{name}/id/{age}", (*Context).Hello)
+	r.Get("/hello/{name}/error", (*Context).HelloHtml)
 	http.ListenAndServe(":8081", r)
 }
 
@@ -65,15 +65,15 @@ import (
 
 func main() {
 	r := ctxrouter.New()
-	r.Get("/resp/:msg", (*Context).Resp)
-	r.Get("/basic/:name", (*Context).Hello)
-	r.Get("/normal/:name", NormalHello)
-	r.Get("/func/:name/:id",Hello)
+	r.Get("/resp/{msg}", (*Context).Resp)
+	r.Get("/basic/{name}", (*Context).Hello)
+	r.Get("/normal/{name}", NormalHello)
+	r.Get("/func/{name}/{id}",Hello)
 	r.Get("/", (*Context).Index)
 	//auto decode url with string or int
-	r.Get("/basic/:name/json/:age", (*Context).Json)
+	r.Get("/basic/{name}/json/{age}", (*Context).Json)
 	//match path prefixes /all/*:
-	r.All("/basic/*path",(*Context).All)
+	r.All("/basic/{path=**}",(*Context).All)
 	//a simple func without implement ctxrouter.Context
 	http.ListenAndServe(":8081", r)
 }
@@ -135,7 +135,7 @@ func main() {
 
 type Error struct {
 	Code  int `json:"code"`
-	Msg   string `json:"msg"`
+	Error   string `json:"error"`
 }
 
 func (this *Error) StatusCode() int{
@@ -144,7 +144,7 @@ func (this *Error) StatusCode() int{
 
 //Use Custom error
 func (ctx *Context) RespError() (interface{}, *Error){
-	return nil,&Error{Code:3000, Msg:"some error message"}
+	return nil,&Error{Code:3000, Error:"some error message"}
 }
 
 
@@ -194,7 +194,7 @@ func (c *Context) End() {
 
 func main() {
 	r := ctxrouter.New()
-	r.Get("/context/",(*Context).Start)
+	r.Get("/context",(*Context).Start)
 	http.ListenAndServe(":8081", r)
 }
 ```
@@ -341,11 +341,11 @@ import (
 func main() {
 	r := ctxrouter.New()
 	r.Get("/apps", (*AppContext).GetApps)
-	r.Get("/apps/:id", (*AppContext).GetApp)
+	r.Get("/apps/{id}", (*AppContext).GetApp)
 	r.Post("/apps", (*AppContext).PostApps)
-	r.Patch("/apps/:id", (*AppContext).PatchApp)
-	r.Put("/apps/:id", (*AppContext).PutApp)
-	r.Delete("/apps/:id", (*AppContext).DeleteApp)
+	r.Patch("/apps/{id}", (*AppContext).PatchApp)
+	r.Put("/apps/{id}", (*AppContext).PutApp)
+	r.Delete("/apps/{id}", (*AppContext).DeleteApp)
 	http.ListenAndServe(":8081", r)
 }
 type AppContext struct {
@@ -387,13 +387,13 @@ import (
 func main() {
 	r := ctxrouter.New()
 	r.Get("/", (*Controller).Index)
-	r.Get("/basic/:name", (*Controller).Hello)
+	r.Get("/basic/{name}", (*Controller).Hello)
 	//match path prefixes /all/*:
-	r.All("/basic/*path",(*Controller).All)
+	r.All("/basic/{path=**}",(*Controller).All)
 	//auto decode url with string or int
-	r.Get("/basic/:name/json/:age", (*Controller).Json)
+	r.Get("/basic/{name}/json/:age", (*Controller).Json)
 	//a simple func without implement ctxrouter.Context
-	r.Get("/basic/:name/simple",Simple)
+	r.Get("/basic/{name}/simple",Simple)
 
 	r.Post("/users/hello",(*UserContext).PrintHello)
 
@@ -402,13 +402,13 @@ func main() {
 
 
 	r.Get("/normal/hello",NormalHelloHandler)
-	r.Get("/normal/v1/:name/:age",NormalHandler)
+	r.Get("/normal/v1/{name}/{age}",NormalHandler)
 	//support any http.Handler interface
 	r.Get("/404",http.NotFoundHandler())
 
 	//static files
 	var dir = "/your/static/dir/path"
-	r.All("/static/*path",http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
+	r.All("/static/{path=*}",http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 	http.ListenAndServe(":8081", r)
 }
 
@@ -495,8 +495,6 @@ func NormalHandler(w http.ResponseWriter, r *http.Request) {
 ```
 
 
-
-
 # Thanks 
 
-* tree.go & tree_test.go is edited from httprouter https://github.com/julienschmidt/httprouter
+* route matching algorithm is by google
