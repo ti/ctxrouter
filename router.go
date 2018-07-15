@@ -1,17 +1,19 @@
 package ctxrouter
 
 import (
-	"strings"
-	"reflect"
-	"net/http"
-	"strconv"
 	"errors"
+	"net/http"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
+//Router the router
 type Router struct {
-	handlers               map[string][]Handler
+	handlers map[string][]Handler
 }
 
+//Handle handler path in router
 func (s *Router) Handle(method, path string, v interface{}) error {
 	if method == "" {
 		method = "*"
@@ -22,9 +24,9 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 		return err
 	}
 	val := Handler{
-		V:v,
-		Pat:pattern,
-		callV:reflect.ValueOf(v),
+		V:     v,
+		Pat:   pattern,
+		callV: reflect.ValueOf(v),
 	}
 	if reflect.TypeOf(v).Kind() == reflect.Func {
 		if _, ok := val.callV.Interface().(http.HandlerFunc); ok {
@@ -51,9 +53,8 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 	return nil
 }
 
-
 // Match dispatches the request to the first handler whose pattern matches to r.Method and r.Path.
-func (s *Router) Match(method string, path string) (h Handler, pathParams map[string]string, paramsList []string, err error){
+func (s *Router) Match(method string, path string) (h Handler, pathParams map[string]string, paramsList []string, err error) {
 	components := strings.Split(path[1:], "/")
 	l := len(components)
 	var verb string
@@ -61,14 +62,14 @@ func (s *Router) Match(method string, path string) (h Handler, pathParams map[st
 		c := components[l-1]
 		components[l-1], verb = c[:idx], c[idx+1:]
 	}
-	h, pathParams, paramsList, err = match(s.handlers[method],components, verb)
+	h, pathParams, paramsList, err = match(s.handlers[method], components, verb)
 	if err != nil {
-		return match(s.handlers["*"],components, verb)
+		return match(s.handlers["*"], components, verb)
 	}
 	return
 }
 
-func match(handlers []Handler, components []string, verb string)(h Handler, pathParams map[string]string, paramsList []string, err error) {
+func match(handlers []Handler, components []string, verb string) (h Handler, pathParams map[string]string, paramsList []string, err error) {
 	for _, handler := range handlers {
 		pathParams, p, err := handler.Pat.Match(components, verb)
 		if err != nil {
@@ -82,41 +83,38 @@ func match(handlers []Handler, components []string, verb string)(h Handler, path
 				if err == nil {
 					handler.paramsV = append(handler.paramsV, pv)
 				} else {
-					return handler, pathParams, p,ErrNotMatch
+					return handler, pathParams, p, ErrNotMatch
 				}
 			}
 		}
-		return handler, pathParams, p,nil
+		return handler, pathParams, p, nil
 	}
 	err = ErrNotMatch
 	return
 }
-
 
 type Handler struct {
 	Pat Pattern
 	V   interface{}
 
 	//some values for reflect call
-	callV     reflect.Value
-	callT     reflect.Type
-	paramsV   []reflect.Value
-	paramsT   []reflect.Type
+	callV   reflect.Value
+	callT   reflect.Type
+	paramsV []reflect.Value
+	paramsT []reflect.Type
 	//faster when callback
 	hasParams bool
 }
-
-
 
 //adapterStr change /v1/home/:id/name style to /v1/home/{id}/name style
 //
 // Deprecated: use /v1/home/{id}/name style
 func adapterRouterStyle(src string) string {
 	var prefix bool
-	for i :=0; i< len(src); i ++ {
+	for i := 0; i < len(src); i++ {
 		v := src[i]
 		if prefix && v == '/' {
-			src = src[0:i] + "}" +  src[i:]
+			src = src[0:i] + "}" + src[i:]
 			prefix = false
 			continue
 		}
@@ -124,7 +122,7 @@ func adapterRouterStyle(src string) string {
 			if v == ':' && src[i-1] == '/' {
 				src = src[0:i] + "{" + src[i+1:]
 				prefix = true
-			} else if v == '*' && src[i-1] == '/' && i < len(src) -1 {
+			} else if v == '*' && src[i-1] == '/' && i < len(src)-1 {
 				src = src[0:i] + "{" + src[i+1:] + "=**}"
 				break
 			}
@@ -136,17 +134,16 @@ func adapterRouterStyle(src string) string {
 	return src
 }
 
-
-func ParsePatternUrl(path string)  (pattern Pattern, err error){
+//ParsePatternUrl parse any path to google pattern
+func ParsePatternUrl(path string) (pattern Pattern, err error) {
 	cp, err := Parse(path)
 	if err != nil {
 		return
 	}
 	tp := cp.Compile()
-	pattern , err = NewPattern(tp.OpCodes, tp.Pool, tp.Verb)
+	pattern, err = NewPattern(tp.OpCodes, tp.Pool, tp.Verb)
 	return
 }
-
 
 //strConv convert string params to function params
 func strConv(src string, t reflect.Type) (rv reflect.Value, err error) {

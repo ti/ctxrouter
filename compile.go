@@ -83,12 +83,12 @@ func (t template) Compile() Template {
 		pool   []string
 		fields []string
 	)
-	hasEof := strings.HasSuffix(t.template,"/")
+	hasEof := strings.HasSuffix(t.template, "/")
 
 	consts := make(map[string]int)
 	for _, op := range rawOps {
 		ops = append(ops, int(op.code))
-		if op.str == "" && !hasEof{
+		if op.str == "" && !hasEof {
 			ops = append(ops, op.num)
 		} else {
 			if _, ok := consts[op.str]; !ok {

@@ -1,9 +1,9 @@
 package ctxrouter
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
-	"encoding/json"
 )
 
 //Param get params form request (It is faster than most other function, because there is no extra compute )
@@ -62,7 +62,7 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else if len(rets) == 2 {
-		if (rets[1].IsNil()) {
+		if rets[1].IsNil() {
 			if data, ok := rets[0].Interface().(interface{}); ok {
 				if d, err := json.Marshal(data); err == nil {
 					w.Header().Set("Content-Type", "application/json")
@@ -74,7 +74,7 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				d, _ := json.Marshal(httpError)
 				w.Header().Set("Content-Type", "application/json")
 				statusCode := httpError.StatusCode()
-				if (statusCode > 0) {
+				if statusCode > 0 {
 					w.WriteHeader(statusCode)
 				} else {
 					w.WriteHeader(400)

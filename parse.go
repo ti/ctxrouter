@@ -35,9 +35,9 @@ func Parse(tmpl string) (Compiler, error) {
 
 func tokenize(path string) (tokens []string, verb string) {
 	if path == "" {
-		return []string{"",eof}, ""
+		return []string{"", eof}, ""
 	}
-	hasEof := strings.HasSuffix(path,"/")
+	hasEof := strings.HasSuffix(path, "/")
 	const (
 		init = iota
 		field

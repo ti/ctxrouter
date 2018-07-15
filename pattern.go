@@ -2,8 +2,8 @@ package ctxrouter
 
 import (
 	"errors"
-	"strings"
 	"fmt"
+	"strings"
 )
 
 var (
@@ -128,7 +128,7 @@ func MustPattern(p Pattern, err error) Pattern {
 // If otherwise, the function returns an error.
 func (p Pattern) Match(components []string, verb string) (map[string]string, []string, error) {
 	if p.verb != verb {
-		return nil,nil, ErrNotMatch
+		return nil, nil, ErrNotMatch
 	}
 
 	var pos int
@@ -141,12 +141,12 @@ func (p Pattern) Match(components []string, verb string) (map[string]string, []s
 			continue
 		case OpPush, OpLitPush:
 			if pos >= l {
-				return nil,nil,  ErrNotMatch
+				return nil, nil, ErrNotMatch
 			}
 			c := components[pos]
 			if op.code == OpLitPush {
 				if lit := p.pool[op.operand]; c != lit {
-					return nil,nil, ErrNotMatch
+					return nil, nil, ErrNotMatch
 				}
 			}
 			stack = append(stack, c)
@@ -154,7 +154,7 @@ func (p Pattern) Match(components []string, verb string) (map[string]string, []s
 		case OpPushM:
 			end := len(components)
 			if end < pos+p.tailLen {
-				return nil,nil, ErrNotMatch
+				return nil, nil, ErrNotMatch
 			}
 			end -= p.tailLen
 			stack = append(stack, strings.Join(components[pos:end], "/"))
@@ -170,7 +170,7 @@ func (p Pattern) Match(components []string, verb string) (map[string]string, []s
 		}
 	}
 	if pos < l {
-		return nil,nil,  ErrNotMatch
+		return nil, nil, ErrNotMatch
 	}
 	bindings := make(map[string]string)
 	bindingList := []string{}
@@ -185,9 +185,8 @@ func (p Pattern) Match(components []string, verb string) (map[string]string, []s
 // Verb returns the verb part of the Pattern.
 func (p Pattern) Verb() string { return p.verb }
 
-
 // Reduction reduction the path by path Params
-func (p Pattern) Reduction(pathParams  map[string]string) string {
+func (p Pattern) Reduction(pathParams map[string]string) string {
 	var stack []string
 	for _, op := range p.ops {
 		switch op.code {
@@ -205,7 +204,7 @@ func (p Pattern) Reduction(pathParams  map[string]string) string {
 			stack = append(stack[:l], strings.Join(stack[l:], "/"))
 		case OpCapture:
 			n := len(stack) - 1
-			stack[n] =  pathParams[p.vars[op.operand]]
+			stack[n] = pathParams[p.vars[op.operand]]
 		}
 	}
 	segs := strings.Join(stack, "/")
@@ -217,7 +216,7 @@ func (p Pattern) Reduction(pathParams  map[string]string) string {
 
 func (p Pattern) String() string {
 	var stack []string
-	for _, op := range p.ops     {
+	for _, op := range p.ops {
 		switch op.code {
 		case OpNop:
 			continue
