@@ -12,60 +12,60 @@ type Error struct {
 	ErrorType        string      `json:"error,omitempty"`
 	ErrorDescription string      `json:"error_description,omitempty"`
 	ErrorCode        int         `json:"error_code,omitempty"`
-	ErrorUri         string      `json:"error_uri,omitempty"`
+	ErrorURI         string      `json:"error_uri,omitempty"`
 	ErrorData        interface{} `json:"error_data,omitempty"`
 }
 
 //Error return error text
-func (this *Error) Error() string {
-	resp := this.ErrorType
-	if this.ErrorDescription != "" {
-		resp += ": " + this.ErrorDescription
+func (e *Error) Error() string {
+	resp := e.ErrorType
+	if e.ErrorDescription != "" {
+		resp += ": " + e.ErrorDescription
 	}
 	return resp
 }
 
 //StatusCode return http status code in error
-func (this *Error) StatusCode() int {
-	return this.Status
+func (e *Error) StatusCode() int {
+	return e.Status
 }
 
 //SetDescription the error detail
-func (this *Error) SetDescription(description string) *Error {
-	this.ErrorDescription = description
-	return this
+func (e *Error) SetDescription(description string) *Error {
+	e.ErrorDescription = description
+	return e
 }
 
 //SetErrorCode set error code
-func (this *Error) SetErrorCode(code int) *Error {
-	this.ErrorCode = code
-	return this
+func (e *Error) SetErrorCode(code int) *Error {
+	e.ErrorCode = code
+	return e
 }
 
 //SetErrorDescription set errorDescription by error
-func (this *Error) SetErrorDescription(errorDescription error) *Error {
+func (e *Error) SetErrorDescription(errorDescription error) *Error {
 	if errorDescription != nil {
-		this.ErrorDescription = errorDescription.Error()
+		e.ErrorDescription = errorDescription.Error()
 	}
-	return this
+	return e
 }
 
-//SetUri set error uri
-func (this *Error) SetUri(uri string) *Error {
-	this.ErrorUri = uri
-	return this
+//SetURI set error uri
+func (e *Error) SetURI(uri string) *Error {
+	e.ErrorURI = uri
+	return e
 }
 
 //SetStatus set http status code in error
-func (this *Error) SetStatus(status int) *Error {
-	this.Status = status
-	return this
+func (e *Error) SetStatus(status int) *Error {
+	e.Status = status
+	return e
 }
 
 //SetData set error data
-func (this *Error) SetData(data interface{}) *Error {
-	this.ErrorData = data
-	return this
+func (e *Error) SetData(data interface{}) *Error {
+	e.ErrorData = data
+	return e
 }
 
 //NewError new error by type
@@ -73,9 +73,9 @@ func NewError(t string) *Error {
 	return &Error{Status: 400, ErrorType: t}
 }
 
-//HttpStatusError new error by http status code
+//HTTPStatusError new error by http status code
 //the error type is http status text
-func HttpStatusError(status int) *Error {
+func HTTPStatusError(status int) *Error {
 	return &Error{Status: status, ErrorType: strings.ToLower(strings.Replace(http.StatusText(status), " ", "_", -1))}
 }
 

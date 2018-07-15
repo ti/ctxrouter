@@ -37,7 +37,7 @@ func tokenize(path string) (tokens []string, verb string) {
 	if path == "" {
 		return []string{"", eof}, ""
 	}
-	hasEof := strings.HasSuffix(path, "/")
+	hasEOF := strings.HasSuffix(path, "/")
 	const (
 		init = iota
 		field
@@ -84,7 +84,7 @@ func tokenize(path string) (tokens []string, verb string) {
 	} else if idx > 0 {
 		tokens[l-1], verb = t[:idx], t[idx+1:]
 	}
-	if hasEof {
+	if hasEOF {
 		tokens = append(tokens, "")
 	}
 	tokens = append(tokens, eof)

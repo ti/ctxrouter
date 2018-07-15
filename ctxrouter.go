@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-//Param get params form request (It is faster than most other function, because there is no extra compute )
+//Params get params form request (It is faster than most other function, because there is no extra compute )
 //req http.Request
 func Params(req *http.Request) []string {
 	return req.Header[paramHeader]
@@ -14,17 +14,21 @@ func Params(req *http.Request) []string {
 
 const paramHeader = "X-Ctxrouter-Params"
 
+//ContextInterface the interface of any context
+//the context must have Init and DecodeRequest
 type ContextInterface interface {
 	Init(http.ResponseWriter, *http.Request)
 	DecodeRequest() error
 }
 
+//New new router
 func New() *Router {
 	return &Router{
 		handlers: make(map[string][]Handler),
 	}
 }
 
+//ServeHTTP just used by system http handler
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	val, _, params, err := r.Match(req.Method, req.URL.Path)
 	if err != nil {
@@ -88,47 +92,56 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+//Get http Get method
 func (r *Router) Get(path string, controller interface{}) {
 	if err := r.Handle("GET", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Post http Post method
 func (r *Router) Post(path string, controller interface{}) {
 	if err := r.Handle("POST", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Patch http Patch method
 func (r *Router) Patch(path string, controller interface{}) {
 	if err := r.Handle("PATCH", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Put http Put method
 func (r *Router) Put(path string, controller interface{}) {
 	if err := r.Handle("PUT", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Delete http Delete method
 func (r *Router) Delete(path string, controller interface{}) {
 	if err := r.Handle("DELETE", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Head http Head method
 func (r *Router) Head(path string, controller interface{}) {
 	if err := r.Handle("HEAD", path, controller); err != nil {
 		panic(err)
 	}
 }
 
+//Options http Options method
 func (r *Router) Options(path string, controller interface{}) {
 	if err := r.Handle("OPTIONS", path, controller); err != nil {
 		panic(err)
 	}
 }
+
+//All http all method
 func (r *Router) All(path string, controller interface{}) {
 	if err := r.Handle("*", path, controller); err != nil {
 		panic(err)

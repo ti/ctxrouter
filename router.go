@@ -19,7 +19,7 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 		method = "*"
 	}
 	path = adapterRouterStyle(path)
-	pattern, err := ParsePatternUrl(path)
+	pattern, err := ParsePatternURL(path)
 	if err != nil {
 		return err
 	}
@@ -93,6 +93,7 @@ func match(handlers []Handler, components []string, verb string) (h Handler, pat
 	return
 }
 
+//Handler the handler instance in router
 type Handler struct {
 	Pat Pattern
 	V   interface{}
@@ -106,7 +107,7 @@ type Handler struct {
 	hasParams bool
 }
 
-//adapterStr change /v1/home/:id/name style to /v1/home/{id}/name style
+//adapterRouterStyle change /v1/home/:id/name style to /v1/home/{id}/name style
 //
 // Deprecated: use /v1/home/{id}/name style
 func adapterRouterStyle(src string) string {
@@ -134,8 +135,8 @@ func adapterRouterStyle(src string) string {
 	return src
 }
 
-//ParsePatternUrl parse any path to google pattern
-func ParsePatternUrl(path string) (pattern Pattern, err error) {
+//ParsePatternURL parse any path to google pattern
+func ParsePatternURL(path string) (pattern Pattern, err error) {
 	cp, err := Parse(path)
 	if err != nil {
 		return

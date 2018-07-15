@@ -35,8 +35,8 @@ func (c *Context) DecodeRequest() error {
 	return nil
 }
 
-//DecodeJson decode json
-func (c *Context) DecodeJson(data interface{}) error {
+//DecodeJSON decode json
+func (c *Context) DecodeJSON(data interface{}) error {
 	decoder := json.NewDecoder(c.Request.Body)
 	if err := decoder.Decode(data); err != nil {
 		return errors.New("json decode error - " + err.Error())
