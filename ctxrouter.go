@@ -25,24 +25,24 @@ func New() *Router {
 	}
 }
 
-func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	val, _, params, err := this.Match(r.Method, r.URL.Path)
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	val, _, params, err := r.Match(req.Method, req.URL.Path)
 	if err != nil {
-		http.NotFound(w, r)
+		http.NotFound(w, req)
 		return
 	}
 
 	if val.callT == nil {
-		r.Header[paramHeader] = params
+		req.Header[paramHeader] = params
 		if h, ok := val.callV.Interface().(http.HandlerFunc); ok {
-			h.ServeHTTP(w, r)
+			h.ServeHTTP(w, req)
 		} else if hf, ok := val.callV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
-			hf(w, r)
+			hf(w, req)
 		}
 		return
 	}
 	ctx := reflect.New(val.callT).Interface().(ContextInterface)
-	ctx.Init(w, r)
+	ctx.Init(w, req)
 	if err := ctx.DecodeRequest(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -88,49 +88,49 @@ func (this *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (this *Router) Get(path string, controller interface{}) {
-	if err := this.Handle("GET", path, controller); err != nil {
+func (r *Router) Get(path string, controller interface{}) {
+	if err := r.Handle("GET", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Post(path string, controller interface{}) {
-	if err := this.Handle("POST", path, controller); err != nil {
+func (r *Router) Post(path string, controller interface{}) {
+	if err := r.Handle("POST", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Patch(path string, controller interface{}) {
-	if err := this.Handle("PATCH", path, controller); err != nil {
+func (r *Router) Patch(path string, controller interface{}) {
+	if err := r.Handle("PATCH", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Put(path string, controller interface{}) {
-	if err := this.Handle("PUT", path, controller); err != nil {
+func (r *Router) Put(path string, controller interface{}) {
+	if err := r.Handle("PUT", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Delete(path string, controller interface{}) {
-	if err := this.Handle("DELETE", path, controller); err != nil {
+func (r *Router) Delete(path string, controller interface{}) {
+	if err := r.Handle("DELETE", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Head(path string, controller interface{}) {
-	if err := this.Handle("HEAD", path, controller); err != nil {
+func (r *Router) Head(path string, controller interface{}) {
+	if err := r.Handle("HEAD", path, controller); err != nil {
 		panic(err)
 	}
 }
 
-func (this *Router) Options(path string, controller interface{}) {
-	if err := this.Handle("OPTIONS", path, controller); err != nil {
+func (r *Router) Options(path string, controller interface{}) {
+	if err := r.Handle("OPTIONS", path, controller); err != nil {
 		panic(err)
 	}
 }
-func (this *Router) All(path string, controller interface{}) {
-	if err := this.Handle("*", path, controller); err != nil {
+func (r *Router) All(path string, controller interface{}) {
+	if err := r.Handle("*", path, controller); err != nil {
 		panic(err)
 	}
 }

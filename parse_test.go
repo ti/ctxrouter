@@ -13,10 +13,6 @@ func TestTokenize(t *testing.T) {
 		tokens []string
 	}{
 		{
-			src:    "",
-			tokens: []string{eof},
-		},
-		{
 			src:    "v1",
 			tokens: []string{"v1", eof},
 		},
