@@ -29,11 +29,10 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 		callV: reflect.ValueOf(v),
 	}
 	if reflect.TypeOf(v).Kind() == reflect.Func {
-		if _, ok := val.callV.Interface().(http.HandlerFunc); ok {
+		switch val.callV.Interface().(type) {
+		case http.HandlerFunc, func(http.ResponseWriter, *http.Request):
 			//do noting
-		} else if _, ok := val.callV.Interface().(func(http.ResponseWriter, *http.Request)); ok {
-			//do noting
-		} else {
+		default:
 			val.callT = reflect.TypeOf(v).In(0).Elem()
 			paramsLen := val.callV.Type().NumIn()
 			val.hasParams = paramsLen > 1

@@ -1,5 +1,7 @@
 # A HTTP request router with Context
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ti/ctxrouter)](https://goreportcard.com/report/github.com/ti/ctxrouter)
+
 * [Features](#features)
 * [Examples](#examples)
   * [Hello Word](#hello-word)
