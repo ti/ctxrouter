@@ -15,9 +15,6 @@ type Router struct {
 
 //Handle handler path in router
 func (s *Router) Handle(method, path string, v interface{}) error {
-	if method == "" {
-		method = "*"
-	}
 	path = adapterRouterStyle(path)
 	pattern, err := ParsePatternURL(path)
 	if err != nil {
@@ -45,6 +42,9 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 				}
 			}
 		}
+	}
+	if method == "" {
+		method = "*"
 	}
 	s.handlers[method] = append(s.handlers[method], val)
 	return nil
@@ -147,50 +147,44 @@ func ParsePatternURL(path string) (pattern Pattern, err error) {
 func strConv(src string, t reflect.Type) (rv reflect.Value, err error) {
 	switch t.Kind() {
 	case reflect.String:
-		return reflect.ValueOf(src), nil
+		rv = reflect.ValueOf(src)
 	case reflect.Int:
 		v, err := strconv.Atoi(src)
 		if err == nil {
 			rv = reflect.ValueOf(v)
 		}
-		return rv, err
 	case reflect.Int64:
 		v, err := strconv.ParseInt(src, 10, 64)
 		if err == nil {
 			rv = reflect.ValueOf(v)
 		}
-		return rv, err
 	case reflect.Bool:
 		v, err := strconv.ParseBool(src)
 		if err == nil {
 			rv = reflect.ValueOf(v)
 		}
-		return rv, err
 	case reflect.Float64:
 		v, err := strconv.ParseFloat(src, 64)
 		if err == nil {
 			rv = reflect.ValueOf(v)
 		}
-		return rv, err
 	case reflect.Float32:
 		v, err := strconv.ParseFloat(src, 32)
 		if err == nil {
 			rv = reflect.ValueOf(float32(v))
 		}
-		return rv, err
 	case reflect.Uint64:
 		v, err := strconv.ParseUint(src, 10, 64)
 		if err == nil {
 			rv = reflect.ValueOf(v)
 		}
-		return rv, err
 	case reflect.Uint32:
 		v, err := strconv.ParseUint(src, 10, 32)
 		if err == nil {
 			rv = reflect.ValueOf(uint32(v))
 		}
-		return rv, err
 	default:
-		return rv, errors.New("elem of invalid type")
+		err = errors.New("elem of invalid type")
 	}
+	return rv, err
 }
