@@ -37,13 +37,11 @@ func (s *Router) Handle(method, path string, v interface{}) error {
 			paramsLen := val.callV.Type().NumIn()
 			val.hasParams = paramsLen > 1
 			for i := 0; i < paramsLen; i++ {
-				if i > 0 {
-					if i == 1 {
-						val.paramsT = make([]reflect.Type, 0)
-						val.paramsT = append(val.paramsT, val.callV.Type().In(i))
-					} else if i > 1 {
-						val.paramsT = append(val.paramsT, val.callV.Type().In(i))
-					}
+				if i == 1 {
+					val.paramsT = make([]reflect.Type, 0)
+					val.paramsT = append(val.paramsT, val.callV.Type().In(i))
+				} else if i > 1 {
+					val.paramsT = append(val.paramsT, val.callV.Type().In(i))
 				}
 			}
 		}
