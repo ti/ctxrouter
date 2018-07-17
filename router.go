@@ -120,8 +120,12 @@ func adapterRouterStyle(src string) string {
 			if v == ':' && src[i-1] == '/' {
 				src = src[0:i] + "{" + src[i+1:]
 				prefix = true
-			} else if v == '*' && src[i-1] == '/' && i < len(src)-1 {
-				src = src[0:i] + "{" + src[i+1:] + "=**}"
+			} else if v == '*' && src[i-1] == '/' && i <= len(src)-1 {
+				if src[i+1:] == "" || src[i+1:] == "*" {
+					src = src[0:i] + "{path" + "=**}"
+				} else {
+					src = src[0:i] + "{" + src[i+1:] + "=**}"
+				}
 				break
 			}
 		}
