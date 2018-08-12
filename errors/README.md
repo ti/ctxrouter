@@ -1,0 +1,1 @@
+https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto

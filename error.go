@@ -82,8 +82,8 @@ func HTTPStatusError(status int) *Error {
 //JSONResponse response json to any http writer
 //if data is a error it will response a errror json
 func JSONResponse(w http.ResponseWriter, data interface{}) {
-	if err, ok := data.(*Error); ok {
-		JSONResponseVerbose(w, err.Status, nil, err)
+	if err, ok := data.(ErrorInterface); ok {
+		JSONResponseVerbose(w, err.StatusCode(), nil, err)
 	} else {
 		JSONResponseVerbose(w, 200, nil, data)
 	}
