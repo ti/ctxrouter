@@ -16,7 +16,7 @@
  *
  */
 
-package codes
+package errors
 
 import (
 	"encoding/json"

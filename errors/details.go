@@ -1,10 +1,9 @@
-package errordetails
+package errors
 
+//Detail any thing can be detail
+type Detail interface{}
 
-//ErrorDetail any thing can be detail
-type ErrorDetail interface{}
-
-// Describes when the clients can retry a failed request. Clients could ignore
+// RetryInfo Describes when the clients can retry a failed request. Clients could ignore
 // the recommendation here or retry when this information is missing from error
 // responses.
 //
@@ -22,7 +21,7 @@ type RetryInfo struct {
 	RetryDelay Duration `protobuf:"bytes,1,opt,name=retry_delay,json=retryDelay" json:"retry_delay,omitempty"`
 }
 
-// Describes additional debugging info.
+// DebugInfo Describes additional debugging info.
 type DebugInfo struct {
 	// The stack trace entries indicating where the error occurred.
 	StackEntries []string `protobuf:"bytes,1,rep,name=stack_entries,json=stackEntries" json:"stack_entries,omitempty"`
@@ -30,7 +29,7 @@ type DebugInfo struct {
 	Detail string `protobuf:"bytes,2,opt,name=detail" json:"detail,omitempty"`
 }
 
-// Describes how a quota check failed.
+// QuotaFailure  Describes how a quota check failed.
 //
 // For example if a daily limit was exceeded for the calling project,
 // a service could respond with a QuotaFailure detail containing the project
@@ -43,12 +42,12 @@ type DebugInfo struct {
 // quota failure.
 type QuotaFailure struct {
 	// Describes all quota violations.
-	Violations []*QuotaFailure_Violation `protobuf:"bytes,1,rep,name=violations" json:"violations,omitempty"`
+	Violations []*QuotaFailureViolation `protobuf:"bytes,1,rep,name=violations" json:"violations,omitempty"`
 }
 
-// A message type used to describe a single quota violation.  For example, a
+// QuotaFailureViolation A message type used to describe a single quota violation.  For example, a
 // daily quota or a custom quota that was exceeded.
-type QuotaFailure_Violation struct {
+type QuotaFailureViolation struct {
 	// The subject on which the quota check failed.
 	// For example, "clientip:<ip address of client>" or "project:<Google
 	// developer project id>".
@@ -63,18 +62,18 @@ type QuotaFailure_Violation struct {
 	Description string `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
 }
 
-// Describes what preconditions have failed.
+// PreconditionFailure Describes what preconditions have failed.
 //
 // For example, if an RPC failed because it required the Terms of Service to be
 // acknowledged, it could list the terms of service violation in the
 // PreconditionFailure message.
 type PreconditionFailure struct {
 	// Describes all precondition violations.
-	Violations []*PreconditionFailure_Violation `protobuf:"bytes,1,rep,name=violations" json:"violations,omitempty"`
+	Violations []*PreconditionFailureViolation `protobuf:"bytes,1,rep,name=violations" json:"violations,omitempty"`
 }
 
-// A message type used to describe a single precondition failure.
-type PreconditionFailure_Violation struct {
+// PreconditionFailureViolation A message type used to describe a single precondition failure.
+type PreconditionFailureViolation struct {
 	// The type of PreconditionFailure. We recommend using a service-specific
 	// enum type to define the supported precondition violation types. For
 	// example, "TOS" for "Terms of Service violation".
@@ -90,15 +89,15 @@ type PreconditionFailure_Violation struct {
 	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
 }
 
-// Describes violations in a client request. This error type focuses on the
+// BadRequest Describes violations in a client request. This error type focuses on the
 // syntactic aspects of the request.
 type BadRequest struct {
 	// Describes all violations in a client request.
-	FieldViolations []*BadRequest_FieldViolation `protobuf:"bytes,1,rep,name=field_violations,json=fieldViolations" json:"field_violations,omitempty"`
+	FieldViolations []*BadRequestFieldViolation `protobuf:"bytes,1,rep,name=field_violations,json=fieldViolations" json:"field_violations,omitempty"`
 }
 
-// A message type used to describe a single bad request field.
-type BadRequest_FieldViolation struct {
+// BadRequestFieldViolation A message type used to describe a single bad request field.
+type BadRequestFieldViolation struct {
 	// A path leading to a field in the request body. The value will be a
 	// sequence of dot-separated identifiers that identify a protocol buffer
 	// field. E.g., "field_violations.field" would identify this field.
@@ -107,18 +106,18 @@ type BadRequest_FieldViolation struct {
 	Description string `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
 }
 
-// Contains metadata about the request that clients can attach when filing a bug
+// RequestInfo Contains metadata about the request that clients can attach when filing a bug
 // or providing other forms of feedback.
 type RequestInfo struct {
 	// An opaque string that should only be interpreted by the service generating
 	// it. For example, it can be used to identify requests in the service's logs.
-	RequestId string `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
+	RequestID string `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
 	// Any data that was used to serve this request. For example, an encrypted
 	// stack trace that can be sent back to the service provider for debugging.
 	ServingData string `protobuf:"bytes,2,opt,name=serving_data,json=servingData" json:"serving_data,omitempty"`
 }
 
-// Describes the resource that is being accessed.
+// ResourceInfo Describes the resource that is being accessed.
 type ResourceInfo struct {
 	// A name for the type of resource being accessed, e.g. "sql table",
 	// "cloud storage bucket", "file", "Google calendar"; or the type URL
@@ -138,25 +137,25 @@ type ResourceInfo struct {
 	Description string `protobuf:"bytes,4,opt,name=description" json:"description,omitempty"`
 }
 
-// Provides links to documentation or for performing an out of band action.
+// Help Provides links to documentation or for performing an out of band action.
 //
-// For example, if a quota check failed with an error indicating the calling
+// Help For example, if a quota check failed with an error indicating the calling
 // project hasn't enabled the accessed service, this can contain a URL pointing
 // directly to the right place in the developer console to flip the bit.
 type Help struct {
 	// URL(s) pointing to additional information on handling the current error.
-	Links []*Help_Link `protobuf:"bytes,1,rep,name=links" json:"links,omitempty"`
+	Links []*HelpLink `protobuf:"bytes,1,rep,name=links" json:"links,omitempty"`
 }
 
-// Describes a URL link.
-type Help_Link struct {
+// HelpLink Describes a URL link.
+type HelpLink struct {
 	// Describes what the link offers.
 	Description string `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	// The URL of the link.
-	Url string `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
+	URL string `protobuf:"bytes,2,opt,name=url" json:"url,omitempty"`
 }
 
-// Provides a localized error message that is safe to return to the user
+// LocalizedMessage Provides a localized error message that is safe to return to the user
 // which can be attached to an RPC error.
 type LocalizedMessage struct {
 	// The locale used following the specification defined at
@@ -167,7 +166,7 @@ type LocalizedMessage struct {
 	Message string `protobuf:"bytes,2,opt,name=message" json:"message,omitempty"`
 }
 
-// A Duration represents a signed, fixed-length span of time represented
+// Duration A Duration represents a signed, fixed-length span of time represented
 // as a count of seconds and fractions of seconds at nanosecond
 // resolution. It is independent of any calendar and concepts like "day"
 // or "month". It is related to Timestamp in that the difference between

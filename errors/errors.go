@@ -2,46 +2,43 @@ package errors
 
 import (
 	"fmt"
-
-	"github.com/ti/ctxrouter/codes"
-	detail "github.com/ti/ctxrouter/errordetails"
 )
 
-//errorBody Default HTTP Error
-type errorBody struct {
-	Message string               `json:"error,omitempty"`
-	Code    codes.Code           `json:"code,omitempty"`
-	Details []detail.ErrorDetail `json:"details,omitempty"`
+//Error Default HTTP Error
+type Error struct {
+	Message string   `json:"error,omitempty"`
+	Code    Code     `json:"code,omitempty"`
+	Details []Detail `json:"details,omitempty"`
 }
 
 // New returns a Status representing c and msg.
-func New(c codes.Code, msg string) *errorBody {
-	if c == codes.OK {
+func New(c Code, msg string) *Error {
+	if c == OK {
 		return nil
 	}
-	return &errorBody{
+	return &Error{
 		Message: msg,
 		Code:    c,
 	}
 }
 
 //Error return error text
-func (e *errorBody) Error() string {
-	return fmt.Sprintf("error: code = %s desc = %s", codes.Code(e.Code), e.Message)
+func (e *Error) Error() string {
+	return fmt.Sprintf("error: code = %s desc = %s", Code(e.Code), e.Message)
 }
 
 // Newf returns New(c, fmt.Sprintf(format, a...)).
-func Newf(c codes.Code, format string, a ...interface{}) *errorBody {
+func Newf(c Code, format string, a ...interface{}) *Error {
 	return New(c, fmt.Sprintf(format, a...))
 }
 
 //StatusCode return http status code in error
-func (e *errorBody) StatusCode() int {
-	return codes.HTTPStatusFromCode(e.Code)
+func (e *Error) StatusCode() int {
+	return HTTPStatusFromCode(e.Code)
 }
 
-//StatusCode return http status code in error
-func (e *errorBody) WithDetails(details ...detail.ErrorDetail) *errorBody {
+//WithDetails add detail for error
+func (e *Error) WithDetails(details ...Detail) *Error {
 	e.Details = details
 	return e
 }
