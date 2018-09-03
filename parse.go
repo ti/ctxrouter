@@ -307,6 +307,7 @@ func expectPChars(t string) error {
 	return nil
 }
 
+
 // expectIdent determines if "ident" is a valid identifier in .proto schema ([[:alpha:]_][[:alphanum:]_]*).
 func expectIdent(ident string) error {
 	if ident == "" {

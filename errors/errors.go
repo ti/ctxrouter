@@ -1,8 +1,8 @@
 package errors
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 )
 
 //MarshalJSONWithCode show code field when  MarshalJSON
@@ -51,7 +51,10 @@ func CodeError(c Code) *Error {
 
 //Error return error text
 func (e *Error) Error() string {
-	return fmt.Sprintf("error: code = %s desc = %s", e.Code, e.Message)
+	if e.Message != "" {
+		return e.Message
+	}
+	return fmt.Sprintf("error: code = %d", e.Code)
 }
 
 // Newf returns New(c, fmt.Sprintf(format, a...)).
