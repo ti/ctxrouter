@@ -74,7 +74,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				}
 			}
 		} else {
-			if httpError, ok := rets[1].Interface().(ErrorInterface); ok {
+			if httpError, ok := rets[1].Interface().(Error); ok {
 				d, _ := json.Marshal(httpError)
 				w.Header().Set("Content-Type", "application/json")
 				statusCode := httpError.StatusCode()
