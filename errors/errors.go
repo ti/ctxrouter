@@ -44,9 +44,14 @@ func New(c Code, msg string) *Error {
 	}
 }
 
+//CodeError new error by http status code
+func CodeError(c Code) *Error {
+	return &Error{Code: c, Message: c.String()}
+}
+
 //Error return error text
 func (e *Error) Error() string {
-	return fmt.Sprintf("error: code = %s desc = %s", Code(e.Code), e.Message)
+	return fmt.Sprintf("error: code = %s desc = %s", e.Code, e.Message)
 }
 
 // Newf returns New(c, fmt.Sprintf(format, a...)).

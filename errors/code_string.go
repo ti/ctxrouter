@@ -1,21 +1,3 @@
-/*
- *
- * Copyright 2017 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 package errors
 
 import "strconv"
@@ -23,40 +5,40 @@ import "strconv"
 func (c Code) String() string {
 	switch c {
 	case OK:
-		return "OK"
+		return "ok"
 	case Canceled:
-		return "Canceled"
+		return "canceled"
 	case Unknown:
-		return "Unknown"
+		return "unknown"
 	case InvalidArgument:
-		return "InvalidArgument"
+		return "invalid_argument"
 	case DeadlineExceeded:
-		return "DeadlineExceeded"
+		return "deadline_exceeded"
 	case NotFound:
-		return "NotFound"
+		return "not_found"
 	case AlreadyExists:
-		return "AlreadyExists"
+		return "already_exists"
 	case PermissionDenied:
-		return "PermissionDenied"
+		return "permission_denied"
 	case ResourceExhausted:
-		return "ResourceExhausted"
+		return "resource_exhausted"
 	case FailedPrecondition:
-		return "FailedPrecondition"
+		return "failed_precondition"
 	case Aborted:
-		return "Aborted"
+		return "aborted"
 	case OutOfRange:
-		return "OutOfRange"
+		return "out_of_range"
 	case Unimplemented:
-		return "Unimplemented"
+		return "unimplemented"
 	case Internal:
-		return "Internal"
+		return "internal"
 	case Unavailable:
-		return "Unavailable"
+		return "unavailable"
 	case DataLoss:
-		return "DataLoss"
+		return "data_loss"
 	case Unauthenticated:
-		return "Unauthenticated"
+		return "unauthenticated"
 	default:
-		return "Code(" + strconv.FormatInt(int64(c), 10) + ")"
+		return "code_" + strconv.FormatInt(int64(c), 10)
 	}
 }
