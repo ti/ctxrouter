@@ -2,13 +2,35 @@ package errors
 
 import (
 	"fmt"
+	"encoding/json"
 )
+
+//MarshalJSONWithCode show code field when  MarshalJSON
+var MarshalJSONWithCode = false
 
 //Error Default HTTP Error
 type Error struct {
 	Message string   `json:"error,omitempty"`
 	Code    Code     `json:"code,omitempty"`
 	Details []Detail `json:"details,omitempty"`
+	//compact for simple error
+	Description string `json:"error_description,omitempty"`
+}
+
+//alias of Error without code json output
+type alias struct {
+	Message     string   `json:"error,omitempty"`
+	Code        Code     `json:"-"`
+	Details     []Detail `json:"details,omitempty"`
+	Description string   `json:"error_description,omitempty"`
+}
+
+//MarshalJSON custom json output
+func (e *Error) MarshalJSON() ([]byte, error) {
+	if MarshalJSONWithCode {
+		return json.Marshal(e)
+	}
+	return json.Marshal(alias(*e))
 }
 
 // New returns a Status representing c and msg.
@@ -40,5 +62,11 @@ func (e *Error) StatusCode() int {
 //WithDetails add detail for error
 func (e *Error) WithDetails(details ...Detail) *Error {
 	e.Details = details
+	return e
+}
+
+//WithDescription add description for error
+func (e *Error) WithDescription(description string) *Error {
+	e.Description = description
 	return e
 }
