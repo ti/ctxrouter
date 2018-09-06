@@ -45,7 +45,7 @@ func (ctx *Context) Hello(name string, id int) (interface{}, error){
 }
 
 func (ctx *Context) HelloError(name string) (interface{}, error){
-	return nil, ctxrouter.HttpStatusError(400).SetDescription("some error")
+	return nil, errors.CodeError(errors.InvalidArgument).WithDescription("some error")
 }
 
 type Context struct {
@@ -83,7 +83,7 @@ func main() {
 //context common style
 func (ctx *Context) Resp(msg string) (interface{}, error){
 	if msg == "error" {
-		return nil,ctxrouter.HttpStatusError(400).SetDescription("hello error")
+		return nil,errors.CodeError(errors.InvalidArgument).WithDescription"hello error")
 	}
 	return map[string]bool{"success":true},nil
 }
@@ -144,6 +144,10 @@ func (this *Error) StatusCode() int{
 	return 400
 }
 
+func (this *Error) IsNil() bool {
+	return this.Code == 0
+}
+
 //Use Custom error
 func (ctx *Context) RespError() (interface{}, *Error){
 	return nil,&Error{Code:3000, Error:"some error message"}
@@ -152,7 +156,7 @@ func (ctx *Context) RespError() (interface{}, *Error){
 
 //use default error
 func (ctx *Context) RespErrorDefault() (interface{}, error){
-	return nil,ctxrouter.HttpStatusError(400).SetDescription("hello error")
+	return nil,errors.CodeError(errors.InvalidArgument).WithDescription"hello error")
 }
 
 type Context struct {

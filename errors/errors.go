@@ -33,6 +33,14 @@ func (e *Error) MarshalJSON() ([]byte, error) {
 	return json.Marshal(alias(*e))
 }
 
+//IsNil check if the error is nil
+func (e *Error) IsNil() bool {
+	if e == nil {
+		return true
+	}
+	return e.Code == 0
+}
+
 // New returns a Status representing c and msg.
 func New(c Code, msg string) *Error {
 	if c == OK {

@@ -2,6 +2,8 @@ package ctxrouter
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/ti/ctxrouter/errors"
 	"net/http"
 	"reflect"
 )
@@ -56,40 +58,60 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		in = append(in, val.paramsV...)
 	}
 	rets := val.callV.Call(in)
+	var statusError Error
+	var data interface{}
+	var dataOK bool
 	if len(rets) == 1 {
-		if ret := rets[0]; !ret.IsNil() {
-			if data, ok := rets[0].Interface().(interface{}); ok {
-				if d, err := json.Marshal(data); err == nil {
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(d)
-				}
-			}
+		statusError = errorFromValue(rets[0])
+		if statusError == nil && !rets[0].IsNil() {
+			data, dataOK = rets[0].Interface().(interface{})
 		}
 	} else if len(rets) == 2 {
-		if rets[1].IsNil() {
-			if data, ok := rets[0].Interface().(interface{}); ok {
-				if d, err := json.Marshal(data); err == nil {
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(d)
-				}
-			}
-		} else {
-			if httpError, ok := rets[1].Interface().(Error); ok {
-				d, _ := json.Marshal(httpError)
-				w.Header().Set("Content-Type", "application/json")
-				statusCode := httpError.StatusCode()
-				if statusCode > 0 {
-					w.WriteHeader(statusCode)
-				} else {
-					w.WriteHeader(400)
-				}
-				w.Write(d)
-			} else if errCommon, ok := rets[1].Interface().(error); ok {
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(errCommon.Error()))
-			}
+		statusError = errorFromValue(rets[1])
+		if statusError == nil && !rets[0].IsNil() {
+			data, dataOK = rets[0].Interface().(interface{})
 		}
 	}
+	if statusError == nil {
+		if dataOK {
+			if d, err := json.Marshal(data); err == nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(d)
+				return
+			} else {
+				statusError = errors.CodeError(errors.Internal).WithDescription(err.Error())
+			}
+		} else {
+			statusError = errors.CodeError(errors.Internal).WithDescription("can not assert " + fmt.Sprint(rets[0].Interface()) + " to interface")
+		}
+	}
+	d, _ := json.Marshal(statusError)
+	w.Header().Set("Content-Type", "application/json")
+	statusCode := statusError.StatusCode()
+	if statusCode > 0 {
+		w.WriteHeader(statusCode)
+	} else {
+		w.WriteHeader(400)
+	}
+	w.Write(d)
+}
+
+//errorFromValue bool is if the error is nil
+func errorFromValue(v reflect.Value) Error {
+	if v.IsNil() {
+		return nil
+	}
+	if e, ok := v.Interface().(Error); ok {
+		if e.IsNil() {
+			return nil
+		}
+		return e
+	}
+	errStr := fmt.Sprint(v.Interface())
+	if len(errStr) > 0 {
+		return errors.CodeError(errors.Unknown).WithDescription(errStr)
+	}
+	return nil
 }
 
 //Get http Get method

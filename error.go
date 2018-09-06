@@ -9,6 +9,7 @@ import (
 type Error interface {
 	StatusCode() int
 	Error() string
+	IsNil() bool
 }
 
 //JSONResponse response json to any http writer
