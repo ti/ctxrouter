@@ -107,9 +107,13 @@ func errorFromValue(v reflect.Value) Error {
 		}
 		return e
 	}
-	errStr := fmt.Sprint(v.Interface())
-	if len(errStr) > 0 {
-		return errors.CodeError(errors.Unknown).WithDescription(errStr)
+	if e, ok := v.Interface().(error); ok {
+		if e != nil {
+			errStr := e.Error()
+			if len(errStr) > 0 {
+				return errors.CodeError(errors.Unknown).WithDescription(errStr)
+			}
+		}
 	}
 	return nil
 }
