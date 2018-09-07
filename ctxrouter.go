@@ -2,7 +2,6 @@ package ctxrouter
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/ti/ctxrouter/errors"
 	"net/http"
 	"reflect"
@@ -37,7 +36,6 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.NotFound(w, req)
 		return
 	}
-
 	if val.callT == nil {
 		req.Header[paramHeader] = params
 		if h, ok := val.callV.Interface().(http.HandlerFunc); ok {
@@ -71,6 +69,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		if statusError == nil && !rets[0].IsNil() {
 			data, dataOK = rets[0].Interface().(interface{})
 		}
+	} else {
+		return
 	}
 	if statusError == nil {
 		if dataOK {
@@ -78,12 +78,9 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(d)
 				return
-			} else {
-				statusError = errors.CodeError(errors.Internal).WithDescription(err.Error())
 			}
-		} else {
-			statusError = errors.CodeError(errors.Internal).WithDescription("can not assert " + fmt.Sprint(rets[0].Interface()) + " to interface")
 		}
+		return
 	}
 	d, _ := json.Marshal(statusError)
 	w.Header().Set("Content-Type", "application/json")
