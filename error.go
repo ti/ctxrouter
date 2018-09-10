@@ -31,7 +31,6 @@ func JSONResponseVerbose(w http.ResponseWriter, status int, header http.Header, 
 			}
 		}
 	}
-	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
 	w.Header().Del("Content-Length")
 
 	if bs, ok := data.([]byte); ok {
