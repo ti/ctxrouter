@@ -5,40 +5,40 @@ import "strconv"
 func (c Code) String() string {
 	switch c {
 	case OK:
-		return "OK"
+		return "ok"
 	case Canceled:
-		return "CANCELED"
+		return "canceled"
 	case Unknown:
-		return "UNKNOWN"
+		return "unknown"
 	case InvalidArgument:
-		return "INVALID_ARGUMENT"
+		return "invalid_argument"
 	case DeadlineExceeded:
-		return "DEADLINE_EXCEEDED"
+		return "deadline_exceeded"
 	case NotFound:
-		return "NOT_FOUND"
+		return "not_found"
 	case AlreadyExists:
-		return "ALREADY_EXISTS"
+		return "already_exists"
 	case PermissionDenied:
-		return "PERMISSION_DENIED"
+		return "permission_denied"
 	case ResourceExhausted:
-		return "RESOURCE_EXHAUSTED"
+		return "resource_exhausted"
 	case FailedPrecondition:
-		return "FAILED_PRECONDITION"
+		return "failed_precondition"
 	case Aborted:
-		return "ABORTED"
+		return "aborted"
 	case OutOfRange:
-		return "OUT_OF_RANGE"
+		return "out_of_range"
 	case Unimplemented:
-		return "UNIMPLEMENTED"
+		return "unimplemented"
 	case Internal:
-		return "INTERNAL"
+		return "internal"
 	case Unavailable:
-		return "UNAVAILABLE"
+		return "unavailable"
 	case DataLoss:
-		return "DATA_LOSS"
+		return "data_loss"
 	case Unauthenticated:
-		return "UNAUTHENTICATED"
+		return "unauthenticated"
 	default:
-		return "CODE_" + strconv.FormatInt(int64(c), 10)
+		return "code_" + strconv.FormatInt(int64(c), 10)
 	}
 }
